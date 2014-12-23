@@ -15,13 +15,8 @@ public class WordTable extends DatabaseTable {
     public void onCreate(SQLiteDatabase database) {
         new Builder(database)
                 .withTableName(getTableName())
-                .withIntegerColumn(getIndexColumn(), true)
                 .withStringColumn(getWordColumn(), true, true)
                 .create();
-    }
-
-    public String getIndexColumn() {
-        return "index";
     }
 
     public String getWordColumn() {

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="add_to_schedule_button_height">72dp</dimen> <!-- including padding -->
+    <dimen name="add_to_schedule_button_height_no_padding">56dp</dimen>
+    <dimen name="keyline_1">24dp</dimen>
+    <dimen name="keyline_1_minus_8dp">16dp</dimen>
+
+</resources>

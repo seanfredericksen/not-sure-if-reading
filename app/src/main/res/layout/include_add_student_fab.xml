@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.frederis.notsureifreading.widget.CheckableFrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/add_student_button"
+    android:layout_width="@dimen/add_to_schedule_button_height"
+    android:layout_height="@dimen/add_to_schedule_button_height"
+    android:layout_marginLeft="@dimen/keyline_1_minus_8dp"
+    android:visibility="visible"
+    android:clickable="true"
+    android:layout_gravity="bottom|right"
+    android:layout_marginRight="20dip"
+    android:layout_marginBottom="20dip"
+    android:focusable="true"
+    android:contentDescription="Add student">
+
+    <ImageView
+        android:id="@+id/add_student_icon"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="center"
+        android:src="@drawable/add_schedule_button_icon_unchecked"
+        android:contentDescription="@null"
+        android:layout_gravity="center"/>
+
+</com.frederis.notsureifreading.widget.CheckableFrameLayout>

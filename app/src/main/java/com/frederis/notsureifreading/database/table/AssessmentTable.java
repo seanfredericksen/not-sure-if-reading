@@ -39,7 +39,7 @@ public class AssessmentTable extends DatabaseTable {
     }
 
     public String get51to100ResultsColumn() {
-        return "oneToFiftyResults";
+        return "fiftyOneToOneHundredResults";
     }
 
 }

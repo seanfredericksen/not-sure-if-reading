@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.frederis.notsureifreading.widget.FloatingLabelLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dip"
+        app:floatingLabelTextAppearance="@style/TextAppearance.AppTheme.FloatingLabel">
+
+        <EditText
+            android:id="@+id/first_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionNext"
+            android:nextFocusDown="@+id/last_name"
+            android:hint="@string/first_name"/>
+
+    </com.frederis.notsureifreading.widget.FloatingLabelLayout>
+
+    <com.frederis.notsureifreading.widget.FloatingLabelLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dip"
+        app:floatingLabelTextAppearance="@style/TextAppearance.AppTheme.FloatingLabel">
+
+        <EditText
+            android:id="@+id/last_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionNext"
+            android:nextFocusDown="@+id/starting_word"
+            android:hint="@string/last_name"/>
+
+    </com.frederis.notsureifreading.widget.FloatingLabelLayout>
+
+    <com.frederis.notsureifreading.widget.FloatingLabelLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dip"
+        app:floatingLabelTextAppearance="@style/TextAppearance.AppTheme.FloatingLabel">
+
+        <EditText
+            android:id="@+id/starting_word"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionNext"
+            android:nextFocusDown="@+id/ending_word"
+            android:singleLine="true"
+            android:hint="@string/starting_word_hint"/>
+
+    </com.frederis.notsureifreading.widget.FloatingLabelLayout>
+
+    <com.frederis.notsureifreading.widget.FloatingLabelLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dip"
+        app:floatingLabelTextAppearance="@style/TextAppearance.AppTheme.FloatingLabel">
+
+        <EditText
+            android:id="@+id/ending_word"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionDone"
+            android:hint="@string/ending_word_hint"/>
+
+    </com.frederis.notsureifreading.widget.FloatingLabelLayout>
+
+
+</merge>

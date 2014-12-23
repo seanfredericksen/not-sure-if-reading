@@ -9,5 +9,11 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_example">Example action</string>
     <string name="action_settings">Settings</string>
+    <string name="first_name">First name</string>
+    <string name="last_name">Last name</string>
+    <string name="starting_word_hint">Starting word number</string>
+    <string name="ending_word_hint">Ending word number</string>
 
+    <string name="student_name">%1$s %2$s</string>
+    <string name="words_description">Words: %1$d - %2$d</string>
 </resources>

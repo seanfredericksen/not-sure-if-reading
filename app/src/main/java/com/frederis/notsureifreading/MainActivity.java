@@ -1,10 +1,11 @@
 package com.frederis.notsureifreading;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,12 +24,7 @@ import static android.content.Intent.ACTION_MAIN;
 import static android.content.Intent.CATEGORY_LAUNCHER;
 import static android.view.MenuItem.SHOW_AS_ACTION_ALWAYS;
 
-/**
- * Hooks up the {@link MortarActivityScope}. Loads the {@link MainView}
- * and lets it know about up button and back button presses. Shares control of the {@link
- * ActionBar} via the {@link ActionBarOwner}.
- */
-public class MainActivity extends Activity implements ActionBarOwner.View {
+public class MainActivity extends ActionBarActivity implements ActionBarOwner.View {
     private MortarActivityScope activityScope;
     private ActionBarOwner.MenuAction actionBarMenuAction;
 
@@ -51,6 +47,9 @@ public class MainActivity extends Activity implements ActionBarOwner.View {
         setContentView(R.layout.activity_main);
         MainView mainView = (MainView) findViewById(R.id.container);
         mainFlow = mainView.getFlow();
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         actionBarOwner.takeView(this);
     }
@@ -122,18 +121,18 @@ public class MainActivity extends Activity implements ActionBarOwner.View {
     }
 
     @Override public void setShowHomeEnabled(boolean enabled) {
-        ActionBar actionBar = getActionBar();
+        ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(false);
     }
 
     @Override public void setUpButtonEnabled(boolean enabled) {
-        ActionBar actionBar = getActionBar();
+        ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(enabled);
         actionBar.setHomeButtonEnabled(enabled);
     }
 
     @Override public void setTitle(CharSequence title) {
-        getActionBar().setTitle(title);
+        getSupportActionBar().setTitle(title);
     }
 
     @Override public void setMenu(ActionBarOwner.MenuAction action) {

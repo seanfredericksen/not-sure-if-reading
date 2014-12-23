@@ -1,8 +1,16 @@
 package com.frederis.notsureifreading;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.util.Log;
+
 import com.frederis.notsureifreading.actionbar.ActionBarModule;
 import com.frederis.notsureifreading.actionbar.ActionBarOwner;
+import com.frederis.notsureifreading.model.Words;
 import com.frederis.notsureifreading.screen.RecentAssessmentListScreen;
+import com.frederis.notsureifreading.screen.StudentsListScreen;
 import com.frederis.notsureifreading.util.FlowOwner;
 import com.frederis.notsureifreading.view.MainView;
 
@@ -45,32 +53,45 @@ public class MainBlueprint implements Blueprint {
 
     @Singleton
     public static class Presenter extends FlowOwner<Blueprint, MainView> {
+
+        private final Context context;
+        private final Words words;
         private final ActionBarOwner actionBarOwner;
 
         @Inject
-        Presenter(Parcer<Object> flowParcer, ActionBarOwner actionBarOwner) {
+        Presenter(@ForApplication Context context, Words words, Parcer<Object> flowParcer, ActionBarOwner actionBarOwner) {
             super(flowParcer);
+
+            this.context = context;
+            this.words = words;
             this.actionBarOwner = actionBarOwner;
+        }
+
+        @Override
+        public void onLoad(Bundle savedInstanceState) {
+            super.onLoad(savedInstanceState);
+
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+            if (!preferences.getBoolean("hasWrittenWords", false)) {
+                words.writeDefaultWords();
+                preferences.edit().putBoolean("hasWrittenWords", true).apply();
+            }
+
         }
 
         @Override
         public void showScreen(Blueprint newScreen, Flow.Direction direction) {
             boolean hasUp = newScreen instanceof HasParent;
             String title = newScreen.getClass().getSimpleName();
-            ActionBarOwner.MenuAction menu =
-                    hasUp ? null : new ActionBarOwner.MenuAction("Friends", new Action0() {
-                        @Override
-                        public void call() {
-                        }
-                    });
-            actionBarOwner.setConfig(new ActionBarOwner.Config(false, hasUp, title, menu));
+
+            actionBarOwner.setConfig(new ActionBarOwner.Config(false, hasUp, title, null));
 
             super.showScreen(newScreen, direction);
         }
 
         @Override
         protected Blueprint getFirstScreen() {
-            return new RecentAssessmentListScreen();
+            return new StudentsListScreen();
         }
 
     }

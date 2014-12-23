@@ -22,6 +22,7 @@ public class RecentAssessmentListView extends ListView {
 
     public RecentAssessmentListView(Context context, AttributeSet attrs) {
         super(context, attrs);
+
         Mortar.inject(context, this);
     }
 

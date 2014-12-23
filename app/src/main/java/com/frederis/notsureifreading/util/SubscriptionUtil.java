@@ -1,5 +1,7 @@
 package com.frederis.notsureifreading.util;
 
+import android.util.Log;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import rx.Observable;
@@ -20,5 +22,22 @@ public class SubscriptionUtil {
                     }
                 });
     }
+
+    static public <T> Subscription subscribeListView(final Observable<T> observable,
+                                                     final ListDataHandler<T> dataHandler) {
+        return observable
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<T>() {
+                    @Override
+                    public void call(T data) {
+                        dataHandler.setData(data);
+                    }
+                });
+    }
+
+    public static interface ListDataHandler<T> {
+        void setData(T data);
+    }
+
 
 }

@@ -10,7 +10,7 @@ public class StudentTable extends DatabaseTable {
 
     @Inject
     public StudentTable(WordTable wordTable) {
-        super("word");
+        super("student");
 
         mWordTable = wordTable;
     }
@@ -19,14 +19,19 @@ public class StudentTable extends DatabaseTable {
     public void onCreate(SQLiteDatabase database) {
         new Builder(database)
                 .withTableName(getTableName())
-                .withStringColumn(getNameColumn(), true, true)
+                .withStringColumn(getFirstNameColumn(), true, true)
+                .withStringColumn(getLastNameColumn(), true, true)
                 .withForeignIdColumn(getStartingWordColumn(), mWordTable.getIdReference(), false)
                 .withForeignIdColumn(getEndingWordColumn(), mWordTable.getIdReference(), false)
                 .create();
     }
 
-    public String getNameColumn() {
-        return "index";
+    public String getFirstNameColumn() {
+        return "firstName";
+    }
+
+    public String getLastNameColumn() {
+        return "lastName";
     }
 
     public String getStartingWordColumn() {
