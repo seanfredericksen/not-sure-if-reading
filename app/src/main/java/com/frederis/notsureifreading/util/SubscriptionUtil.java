@@ -24,7 +24,19 @@ public class SubscriptionUtil {
     }
 
     static public <T> Subscription subscribeListView(final Observable<T> observable,
-                                                     final ListDataHandler<T> dataHandler) {
+                                                          final ListDataHandler<T> dataHandler) {
+        return observable
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<T>() {
+                    @Override
+                    public void call(T data) {
+                        dataHandler.setData(data);
+                    }
+                });
+    }
+
+    static public <T> Subscription subscribeViewPager(final Observable<T> observable,
+                                                      final PagerDataHandler<T> dataHandler) {
         return observable
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<T>() {
@@ -36,6 +48,10 @@ public class SubscriptionUtil {
     }
 
     public static interface ListDataHandler<T> {
+        void setData(T data);
+    }
+
+    public static interface PagerDataHandler<T> {
         void setData(T data);
     }
 

@@ -22,6 +22,7 @@ import com.frederis.notsureifreading.MainBlueprint;
 import com.frederis.notsureifreading.R;
 import com.frederis.notsureifreading.model.Assessment;
 import com.frederis.notsureifreading.model.Assessments;
+import com.frederis.notsureifreading.util.TitledBlueprint;
 import com.frederis.notsureifreading.view.RecentAssessmentListView;
 
 import java.util.List;
@@ -37,7 +38,7 @@ import mortar.ViewPresenter;
 import rx.Observable;
 
 @Layout(R.layout.recent_assessment_list_view) //
-public class RecentAssessmentListScreen implements Blueprint {
+public class RecentAssessmentListScreen implements TitledBlueprint {
 
     @Override
     public String getMortarScopeName() {
@@ -85,4 +86,10 @@ public class RecentAssessmentListScreen implements Blueprint {
         }
 
     }
+
+    @Override
+    public CharSequence getTitle() {
+        return "Recent Assessments";
+    }
+
 }

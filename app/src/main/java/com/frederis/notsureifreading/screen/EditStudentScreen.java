@@ -8,6 +8,7 @@ import com.frederis.notsureifreading.R;
 import com.frederis.notsureifreading.actionbar.ActionBarOwner;
 import com.frederis.notsureifreading.model.Student;
 import com.frederis.notsureifreading.model.Students;
+import com.frederis.notsureifreading.util.TitledBlueprint;
 import com.frederis.notsureifreading.view.EditStudentView;
 
 import javax.inject.Singleton;
@@ -25,7 +26,7 @@ import rx.subjects.BehaviorSubject;
 import rx.subjects.Subject;
 
 @Layout(R.layout.edit_student_view)
-public class EditStudentScreen implements HasParent<StudentsListScreen>, Blueprint {
+public class EditStudentScreen implements HasParent<StudentsListScreen>, TitledBlueprint {
 
     private final long mStudentId;
 
@@ -35,7 +36,7 @@ public class EditStudentScreen implements HasParent<StudentsListScreen>, Bluepri
 
     @Override
     public String getMortarScopeName() {
-        return "EditStudentScreen {" + "studentId = " + mStudentId + '}';
+        return "Edit Student Screen {" + "studentId = " + mStudentId + '}';
     }
 
     @Override
@@ -148,6 +149,10 @@ public class EditStudentScreen implements HasParent<StudentsListScreen>, Bluepri
             students.updateOrInsertStudent(new Student(studentId, firstName, lastName, startingWord, endingWord));
         }
 
+        public void assessStudent() {
+            flow.goTo(new PerformAssessmentScreen(studentId));
+        }
+
         @Override public void dropView(EditStudentView view) {
             super.dropView(view);
         }
@@ -160,7 +165,8 @@ public class EditStudentScreen implements HasParent<StudentsListScreen>, Bluepri
 
             actionBarConfig =
                     actionBarConfig.withAction(new ActionBarOwner.MenuAction("Save", new Action0() {
-                        @Override public void call() {
+                        @Override
+                        public void call() {
                             v.saveStudent();
                             flow.goBack();
                         }
@@ -179,6 +185,11 @@ public class EditStudentScreen implements HasParent<StudentsListScreen>, Bluepri
             v.populateEndingWord(endingWord);
         }
 
+    }
+
+    @Override
+    public CharSequence getTitle() {
+        return "Student Details";
     }
 
 }

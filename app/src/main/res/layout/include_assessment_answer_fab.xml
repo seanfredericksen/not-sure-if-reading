@@ -1,29 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.frederis.notsureifreading.widget.AddStudentFABFrameLayout
+<com.frederis.notsureifreading.widget.CheckableFrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/add_student_button"
+    android:id="@+id/word_identified_button"
     android:layout_width="@dimen/add_to_schedule_button_height"
     android:layout_height="@dimen/add_to_schedule_button_height"
-    android:layout_marginLeft="@dimen/keyline_1"
+    android:layout_marginLeft="@dimen/keyline_1_minus_8dp"
     android:visibility="visible"
     android:clickable="true"
-    android:focusable="true"
     android:layout_gravity="bottom|right"
     android:layout_marginRight="20dip"
     android:layout_marginBottom="20dip"
-    android:elevation="@dimen/fab_elevation"
-    android:background="@drawable/add_schedule_fab_ripple_background_off"
-    android:stateListAnimator="@anim/add_student_fab_state_list_anim"
-    android:contentDescription="Add student">
+    android:focusable="true"
+    android:contentDescription="Sight word correct?">
 
     <ImageView
-        android:id="@+id/add_student_icon"
+        android:id="@+id/word_identified_icon"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="center"
-        android:src="@drawable/add_student_fab_icon_unchecked"
+        android:src="@drawable/word_identified_fab_icon_unchecked"
         android:contentDescription="@null"
         android:layout_gravity="center"/>
 
-</com.frederis.notsureifreading.widget.AddStudentFABFrameLayout>
+</com.frederis.notsureifreading.widget.CheckableFrameLayout>

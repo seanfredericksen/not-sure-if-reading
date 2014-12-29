@@ -5,7 +5,7 @@
     <com.frederis.notsureifreading.widget.FloatingLabelLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dip"
+        android:layout_marginTop="10dip"
         app:floatingLabelTextAppearance="@style/TextAppearance.AppTheme.FloatingLabel">
 
         <EditText
@@ -21,7 +21,7 @@
     <com.frederis.notsureifreading.widget.FloatingLabelLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dip"
+        android:layout_marginTop="10dip"
         app:floatingLabelTextAppearance="@style/TextAppearance.AppTheme.FloatingLabel">
 
         <EditText
@@ -37,7 +37,7 @@
     <com.frederis.notsureifreading.widget.FloatingLabelLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dip"
+        android:layout_marginTop="10dip"
         app:floatingLabelTextAppearance="@style/TextAppearance.AppTheme.FloatingLabel">
 
         <EditText
@@ -54,7 +54,7 @@
     <com.frederis.notsureifreading.widget.FloatingLabelLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dip"
+        android:layout_marginTop="10dip"
         app:floatingLabelTextAppearance="@style/TextAppearance.AppTheme.FloatingLabel">
 
         <EditText
@@ -66,5 +66,14 @@
 
     </com.frederis.notsureifreading.widget.FloatingLabelLayout>
 
+    <Button
+        android:id="@+id/assess_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dip"
+        android:minHeight="56dip"
+        android:padding="15dip"
+        android:layout_gravity="center_horizontal"
+        android:text="ASSESS"/>
 
 </merge>

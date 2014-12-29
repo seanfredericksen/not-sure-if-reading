@@ -9,6 +9,7 @@ import com.frederis.notsureifreading.R;
 import com.frederis.notsureifreading.actionbar.ActionBarOwner;
 import com.frederis.notsureifreading.model.Assessment;
 import com.frederis.notsureifreading.model.Assessments;
+import com.frederis.notsureifreading.util.TitledBlueprint;
 import com.frederis.notsureifreading.view.AssessmentView;
 
 import java.util.concurrent.TimeUnit;
@@ -31,7 +32,7 @@ import rx.subjects.Subject;
 import rx.subscriptions.Subscriptions;
 
 @Layout(R.layout.assessment_view)
-public class AssessmentScreen implements HasParent<RecentAssessmentListScreen>, Blueprint {
+public class AssessmentScreen implements HasParent<RecentAssessmentListScreen>, TitledBlueprint {
 
     private final long mAssessmentId;
 
@@ -148,4 +149,10 @@ public class AssessmentScreen implements HasParent<RecentAssessmentListScreen>, 
             running.unsubscribe();
         }
     }
+
+    @Override
+    public CharSequence getTitle() {
+        return "Assessment";
+    }
+
 }

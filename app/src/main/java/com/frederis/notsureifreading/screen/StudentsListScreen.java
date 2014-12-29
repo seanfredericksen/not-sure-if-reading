@@ -6,8 +6,8 @@ import com.frederis.notsureifreading.MainBlueprint;
 import com.frederis.notsureifreading.R;
 import com.frederis.notsureifreading.model.Student;
 import com.frederis.notsureifreading.model.Students;
+import com.frederis.notsureifreading.util.TitledBlueprint;
 import com.frederis.notsureifreading.view.StudentListView;
-import com.frederis.notsureifreading.view.StudentRecyclerView;
 
 import java.util.ArrayList;
 
@@ -22,7 +22,7 @@ import mortar.ViewPresenter;
 import rx.Observable;
 
 @Layout(R.layout.student_list_view)
-public class StudentsListScreen implements Blueprint {
+public class StudentsListScreen implements TitledBlueprint {
 
     @Override
     public String getMortarScopeName() {
@@ -70,6 +70,11 @@ public class StudentsListScreen implements Blueprint {
             mFlow.goTo(new EditStudentScreen(id));
         }
 
+    }
+
+    @Override
+    public CharSequence getTitle() {
+        return "Students";
     }
 
 }

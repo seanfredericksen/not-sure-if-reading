@@ -12,6 +12,7 @@ import com.frederis.notsureifreading.model.Words;
 import com.frederis.notsureifreading.screen.RecentAssessmentListScreen;
 import com.frederis.notsureifreading.screen.StudentsListScreen;
 import com.frederis.notsureifreading.util.FlowOwner;
+import com.frederis.notsureifreading.util.TitledBlueprint;
 import com.frederis.notsureifreading.view.MainView;
 
 import dagger.Provides;
@@ -52,7 +53,7 @@ public class MainBlueprint implements Blueprint {
     }
 
     @Singleton
-    public static class Presenter extends FlowOwner<Blueprint, MainView> {
+    public static class Presenter extends FlowOwner<TitledBlueprint, MainView> {
 
         private final Context context;
         private final Words words;
@@ -80,17 +81,16 @@ public class MainBlueprint implements Blueprint {
         }
 
         @Override
-        public void showScreen(Blueprint newScreen, Flow.Direction direction) {
+        public void showScreen(TitledBlueprint newScreen, Flow.Direction direction) {
             boolean hasUp = newScreen instanceof HasParent;
-            String title = newScreen.getClass().getSimpleName();
 
-            actionBarOwner.setConfig(new ActionBarOwner.Config(false, hasUp, title, null));
+            actionBarOwner.setConfig(new ActionBarOwner.Config(false, hasUp, newScreen.getTitle(), null));
 
             super.showScreen(newScreen, direction);
         }
 
         @Override
-        protected Blueprint getFirstScreen() {
+        protected TitledBlueprint getFirstScreen() {
             return new StudentsListScreen();
         }
 

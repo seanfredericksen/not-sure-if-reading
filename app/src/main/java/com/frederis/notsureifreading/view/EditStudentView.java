@@ -3,6 +3,8 @@ package com.frederis.notsureifreading.view;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
@@ -24,6 +26,7 @@ public class EditStudentView extends LinearLayout {
     private final EditText mLastName;
     private final EditText mStartinWord;
     private final EditText mEndingWord;
+    private final Button mAssess;
 
     private final CompositeSubscription mCompositeSubscription;
 
@@ -38,6 +41,14 @@ public class EditStudentView extends LinearLayout {
         mLastName = (EditText) findViewById(R.id.last_name);
         mStartinWord = (EditText) findViewById(R.id.starting_word);
         mEndingWord = (EditText) findViewById(R.id.ending_word);
+        mAssess = (Button) findViewById(R.id.assess_button);
+
+        mAssess.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPresenter.assessStudent();
+            }
+        });
 
         mCompositeSubscription = new CompositeSubscription();
     }

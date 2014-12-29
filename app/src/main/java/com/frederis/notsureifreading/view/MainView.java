@@ -8,6 +8,7 @@ import android.widget.FrameLayout;
 import com.frederis.notsureifreading.MainBlueprint;
 import com.frederis.notsureifreading.util.CanShowScreen;
 import com.frederis.notsureifreading.util.ScreenConductor;
+import com.frederis.notsureifreading.util.TitledBlueprint;
 
 import flow.Flow;
 
@@ -16,7 +17,7 @@ import javax.inject.Inject;
 import mortar.Blueprint;
 import mortar.Mortar;
 
-public class MainView extends FrameLayout implements CanShowScreen<Blueprint> {
+public class MainView extends FrameLayout implements CanShowScreen<TitledBlueprint> {
     @Inject MainBlueprint.Presenter presenter;
     private final ScreenConductor<Blueprint> screenMaestro;
 
@@ -37,7 +38,7 @@ public class MainView extends FrameLayout implements CanShowScreen<Blueprint> {
     }
 
     @Override
-    public void showScreen(Blueprint screen, Flow.Direction direction) {
+    public void showScreen(TitledBlueprint screen, Flow.Direction direction) {
         screenMaestro.showScreen(screen, direction);
     }
 }

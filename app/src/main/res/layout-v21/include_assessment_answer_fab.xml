@@ -2,7 +2,7 @@
 
 <com.frederis.notsureifreading.widget.AddStudentFABFrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/add_student_button"
+    android:id="@+id/word_identified_button"
     android:layout_width="@dimen/add_to_schedule_button_height"
     android:layout_height="@dimen/add_to_schedule_button_height"
     android:layout_marginLeft="@dimen/keyline_1"
@@ -18,11 +18,11 @@
     android:contentDescription="Add student">
 
     <ImageView
-        android:id="@+id/add_student_icon"
+        android:id="@+id/word_identified_icon"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="center"
-        android:src="@drawable/add_student_fab_icon_unchecked"
+        android:src="@drawable/word_identified_fab_icon_unchecked"
         android:contentDescription="@null"
         android:layout_gravity="center"/>
 

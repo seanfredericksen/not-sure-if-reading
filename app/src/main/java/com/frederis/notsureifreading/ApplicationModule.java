@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 
 import com.frederis.notsureifreading.database.cursor.StudentCursor;
+import com.frederis.notsureifreading.database.cursor.WordCursor;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -13,7 +14,7 @@ import dagger.Module;
 import dagger.Provides;
 import flow.Parcer;
 
-@Module(injects = StudentCursor.class, library = true)
+@Module(injects = {StudentCursor.class, WordCursor.class}, library = true)
 public class ApplicationModule {
 
     private Application mApplication;

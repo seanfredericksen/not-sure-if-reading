@@ -81,7 +81,6 @@ public class Students {
     }
 
     public Observable<Student> getStudent(final long studentId) {
-        Log.d("NSIR", "Getting student: " + studentId);
         BehaviorSubject<Student> student = BehaviorSubject.create();
 
         Observable.create(new Observable.OnSubscribe<Student>() {
