@@ -11,8 +11,8 @@ public class ActionBarModule {
 
     @Provides
     @Singleton
-    ActionBarOwner provideActionBarOwner() {
-        return new ActionBarOwner();
+    ToolbarOwner provideActionBarOwner() {
+        return new ToolbarOwner();
     }
 
 }

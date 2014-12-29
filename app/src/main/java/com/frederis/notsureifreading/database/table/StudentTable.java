@@ -19,19 +19,14 @@ public class StudentTable extends DatabaseTable {
     public void onCreate(SQLiteDatabase database) {
         new Builder(database)
                 .withTableName(getTableName())
-                .withStringColumn(getFirstNameColumn(), true, true)
-                .withStringColumn(getLastNameColumn(), true, true)
+                .withStringColumn(getNameColumn(), true, true)
                 .withForeignIdColumn(getStartingWordColumn(), mWordTable.getIdReference(), false)
                 .withForeignIdColumn(getEndingWordColumn(), mWordTable.getIdReference(), false)
                 .create();
     }
 
-    public String getFirstNameColumn() {
-        return "firstName";
-    }
-
-    public String getLastNameColumn() {
-        return "lastName";
+    public String getNameColumn() {
+        return "name";
     }
 
     public String getStartingWordColumn() {

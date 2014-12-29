@@ -1,16 +1,20 @@
 package com.frederis.notsureifreading;
 
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.transition.Scene;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
-import com.frederis.notsureifreading.actionbar.ActionBarOwner;
+import com.frederis.notsureifreading.actionbar.ToolbarOwner;
 import com.frederis.notsureifreading.view.MainView;
 
 import flow.Flow;
@@ -24,11 +28,12 @@ import static android.content.Intent.ACTION_MAIN;
 import static android.content.Intent.CATEGORY_LAUNCHER;
 import static android.view.MenuItem.SHOW_AS_ACTION_ALWAYS;
 
-public class MainActivity extends ActionBarActivity implements ActionBarOwner.View {
+public class MainActivity extends ActionBarActivity implements ToolbarOwner.View {
     private MortarActivityScope activityScope;
-    private ActionBarOwner.MenuAction actionBarMenuAction;
+    private ToolbarOwner.MenuAction actionBarMenuAction;
+    private Toolbar mToolbar;
 
-    @Inject ActionBarOwner actionBarOwner;
+    @Inject ToolbarOwner toolbarOwner;
     private Flow mainFlow;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
@@ -48,10 +53,10 @@ public class MainActivity extends ActionBarActivity implements ActionBarOwner.Vi
         MainView mainView = (MainView) findViewById(R.id.container);
         mainFlow = mainView.getFlow();
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
 
-        actionBarOwner.takeView(this);
+        toolbarOwner.takeView(this);
     }
 
     @Override public Object getSystemService(String name) {
@@ -81,7 +86,7 @@ public class MainActivity extends ActionBarActivity implements ActionBarOwner.Vi
         return super.onOptionsItemSelected(item);
     }
 
-    /** Configure the action bar menu as required by {@link ActionBarOwner.View}. */
+    /** Configure the action bar menu as required by {@link com.frederis.notsureifreading.actionbar.ToolbarOwner.View}. */
     @Override public boolean onCreateOptionsMenu(Menu menu) {
         if (actionBarMenuAction != null) {
             menu.add(actionBarMenuAction.title)
@@ -106,7 +111,7 @@ public class MainActivity extends ActionBarActivity implements ActionBarOwner.Vi
     @Override protected void onDestroy() {
         super.onDestroy();
 
-        actionBarOwner.dropView(this);
+        toolbarOwner.dropView(this);
 
         // activityScope may be null in case isWrongInstance() returned true in onCreate()
         if (isFinishing() && activityScope != null) {
@@ -135,11 +140,16 @@ public class MainActivity extends ActionBarActivity implements ActionBarOwner.Vi
         getSupportActionBar().setTitle(title);
     }
 
-    @Override public void setMenu(ActionBarOwner.MenuAction action) {
+    @Override public void setMenu(ToolbarOwner.MenuAction action) {
         if (action != actionBarMenuAction) {
             actionBarMenuAction = action;
             invalidateOptionsMenu();
         }
+    }
+
+    @Override
+    public void setElevationDimension(int elevationDimensionResId) {
+        ViewCompat.setElevation(mToolbar, getResources().getDimension(elevationDimensionResId));
     }
 
     /**

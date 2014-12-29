@@ -24,12 +24,8 @@ public class StudentCursor extends CursorWrapper {
         return getLong(getColumnIndex(mStudentTable.getIdColumnName()));
     }
 
-    public String getFirstName() {
-        return getString(getColumnIndex(mStudentTable.getFirstNameColumn()));
-    }
-
-    public String getLastName() {
-        return getString(getColumnIndex(mStudentTable.getLastNameColumn()));
+    public String getName() {
+        return getString(getColumnIndex(mStudentTable.getNameColumn()));
     }
 
     public long getStartingWord() {

@@ -6,7 +6,7 @@ import android.os.Handler;
 import com.frederis.notsureifreading.MainBlueprint;
 import com.frederis.notsureifreading.MainScope;
 import com.frederis.notsureifreading.R;
-import com.frederis.notsureifreading.actionbar.ActionBarOwner;
+import com.frederis.notsureifreading.actionbar.ToolbarOwner;
 import com.frederis.notsureifreading.model.Assessment;
 import com.frederis.notsureifreading.model.Assessments;
 import com.frederis.notsureifreading.util.TitledBlueprint;
@@ -21,7 +21,6 @@ import dagger.Provides;
 import flow.Flow;
 import flow.HasParent;
 import flow.Layout;
-import mortar.Blueprint;
 import mortar.ViewPresenter;
 import rx.Observable;
 import rx.Subscription;
@@ -68,7 +67,7 @@ public class AssessmentScreen implements HasParent<RecentAssessmentListScreen>, 
         private final Assessments assessments;
         private final Observable<Assessment> assessment;
         private final Flow flow;
-        private final ActionBarOwner actionBar;
+        private final ToolbarOwner actionBar;
 
         private final Subject<String, String> assessmentId = BehaviorSubject.create("Loading id..");
         private final Subject<String, String> assessmentName = BehaviorSubject.create("Loading name..");
@@ -76,7 +75,7 @@ public class AssessmentScreen implements HasParent<RecentAssessmentListScreen>, 
         private Subscription running = Subscriptions.empty();
 
         @Inject
-        public Presenter(Assessments assessments, Observable<Assessment> assessment, @MainScope Flow flow, ActionBarOwner actionBar) {
+        public Presenter(Assessments assessments, Observable<Assessment> assessment, @MainScope Flow flow, ToolbarOwner actionBar) {
             this.assessments = assessments;
             this.assessment = assessment.delay(700, TimeUnit.MILLISECONDS);
             this.flow = flow;
@@ -111,10 +110,10 @@ public class AssessmentScreen implements HasParent<RecentAssessmentListScreen>, 
             final AssessmentView v = getView();
             if (v == null) return;
 
-            ActionBarOwner.Config actionBarConfig = actionBar.getConfig();
+            ToolbarOwner.Config actionBarConfig = actionBar.getConfig();
 
             actionBarConfig =
-                    actionBarConfig.withAction(new ActionBarOwner.MenuAction("End", new Action0() {
+                    actionBarConfig.withAction(new ToolbarOwner.MenuAction("End", new Action0() {
                         @Override public void call() {
                         }
                     }));

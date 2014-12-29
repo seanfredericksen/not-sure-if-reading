@@ -1,6 +1,7 @@
 package com.frederis.notsureifreading.view;
 
 import android.content.Context;
+import android.net.Uri;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,7 @@ import android.widget.LinearLayout;
 import com.frederis.notsureifreading.R;
 import com.frederis.notsureifreading.screen.EditStudentScreen;
 import com.frederis.notsureifreading.util.SubscriptionUtil;
+import com.frederis.notsureifreading.widget.BezelImageView;
 
 import javax.inject.Inject;
 
@@ -22,9 +24,9 @@ public class EditStudentView extends LinearLayout {
 
     @Inject EditStudentScreen.Presenter mPresenter;
 
-    private final EditText mFirstName;
-    private final EditText mLastName;
-    private final EditText mStartinWord;
+    private final BezelImageView mStudentImage;
+    private final EditText mName;
+    private final EditText mStartingWord;
     private final EditText mEndingWord;
     private final Button mAssess;
 
@@ -37,9 +39,9 @@ public class EditStudentView extends LinearLayout {
 
         LayoutInflater.from(context).inflate(R.layout.edit_student_view_root, this, true);
 
-        mFirstName = (EditText) findViewById(R.id.first_name);
-        mLastName = (EditText) findViewById(R.id.last_name);
-        mStartinWord = (EditText) findViewById(R.id.starting_word);
+        mStudentImage = (BezelImageView) findViewById(R.id.edit_student_image);
+        mName = (EditText) findViewById(R.id.edit_name);
+        mStartingWord = (EditText) findViewById(R.id.starting_word);
         mEndingWord = (EditText) findViewById(R.id.ending_word);
         mAssess = (Button) findViewById(R.id.assess_button);
 
@@ -68,22 +70,21 @@ public class EditStudentView extends LinearLayout {
     }
 
     public void saveStudent() {
-        mPresenter.updateOrInsertStudent(mFirstName.getText().toString(),
-                mLastName.getText().toString(),
-                Long.valueOf(mStartinWord.getText().toString()),
+        mPresenter.updateOrInsertStudent(mName.getText().toString(),
+                Long.valueOf(mStartingWord.getText().toString()),
                 Long.valueOf(mEndingWord.getText().toString()));
     }
 
-    public void populateFirstName(Observable<String> firstName) {
-        mCompositeSubscription.add(SubscriptionUtil.subscribeTextViewText(firstName, mFirstName));
+    public void populateImage(Observable<Uri> imageUri) {
+        mCompositeSubscription.add(SubscriptionUtil.subscribeStudentImage(imageUri, getContext(), mStudentImage));
     }
 
-    public void populateLastName(Observable<String> lastName) {
-        mCompositeSubscription.add(SubscriptionUtil.subscribeTextViewText(lastName, mLastName));
+    public void populateName(Observable<String> firstName) {
+        mCompositeSubscription.add(SubscriptionUtil.subscribeTextViewText(firstName, mName));
     }
 
     public void populateStartingWord(Observable<String> startingWord) {
-        mCompositeSubscription.add(SubscriptionUtil.subscribeTextViewText(startingWord, mStartinWord));
+        mCompositeSubscription.add(SubscriptionUtil.subscribeTextViewText(startingWord, mStartingWord));
     }
 
     public void populateEndingWord(Observable<String> endingWord) {

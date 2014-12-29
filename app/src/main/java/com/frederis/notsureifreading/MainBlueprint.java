@@ -4,12 +4,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import com.frederis.notsureifreading.actionbar.ActionBarModule;
-import com.frederis.notsureifreading.actionbar.ActionBarOwner;
+import com.frederis.notsureifreading.actionbar.ToolbarOwner;
 import com.frederis.notsureifreading.model.Words;
-import com.frederis.notsureifreading.screen.RecentAssessmentListScreen;
 import com.frederis.notsureifreading.screen.StudentsListScreen;
 import com.frederis.notsureifreading.util.FlowOwner;
 import com.frederis.notsureifreading.util.TitledBlueprint;
@@ -24,7 +22,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import mortar.Blueprint;
-import rx.functions.Action0;
 
 public class MainBlueprint implements Blueprint {
 
@@ -57,15 +54,15 @@ public class MainBlueprint implements Blueprint {
 
         private final Context context;
         private final Words words;
-        private final ActionBarOwner actionBarOwner;
+        private final ToolbarOwner toolbarOwner;
 
         @Inject
-        Presenter(@ForApplication Context context, Words words, Parcer<Object> flowParcer, ActionBarOwner actionBarOwner) {
+        Presenter(@ForApplication Context context, Words words, Parcer<Object> flowParcer, ToolbarOwner toolbarOwner) {
             super(flowParcer);
 
             this.context = context;
             this.words = words;
-            this.actionBarOwner = actionBarOwner;
+            this.toolbarOwner = toolbarOwner;
         }
 
         @Override
@@ -84,7 +81,7 @@ public class MainBlueprint implements Blueprint {
         public void showScreen(TitledBlueprint newScreen, Flow.Direction direction) {
             boolean hasUp = newScreen instanceof HasParent;
 
-            actionBarOwner.setConfig(new ActionBarOwner.Config(false, hasUp, newScreen.getTitle(), null));
+            toolbarOwner.setConfig(new ToolbarOwner.Config(false, hasUp, newScreen.getTitle(), null, R.dimen.toolbar_elevation));
 
             super.showScreen(newScreen, direction);
         }

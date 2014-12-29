@@ -1,38 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+       xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <com.frederis.notsureifreading.widget.FloatingLabelLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dip"
-        app:floatingLabelTextAppearance="@style/TextAppearance.AppTheme.FloatingLabel">
+        android:orientation="horizontal"
+        android:background="@color/primary"
+        android:elevation="@dimen/toolbar_elevation"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="24dp"
+        android:paddingTop="8dp">
 
-        <EditText
-            android:id="@+id/first_name"
-            android:layout_width="match_parent"
+        <com.frederis.notsureifreading.widget.BezelImageView
+            android:id="@+id/edit_student_image"
+            app:maskDrawable="@drawable/circle_mask"
+            android:layout_width="90dip"
+            android:layout_height="90dip"
+            android:layout_gravity="center_vertical"
+            app:borderDrawable="@drawable/circle_border"
+            android:clickable="true"
+            android:focusable="true"
+            app:desaturateOnPress="true"
+            android:layout_marginRight="10dip"
+            android:scaleType="centerCrop"/>
+
+        <com.frederis.notsureifreading.widget.FloatingLabelLayout
+            android:layout_width="0dip"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:imeOptions="actionNext"
-            android:nextFocusDown="@+id/last_name"
-            android:hint="@string/first_name"/>
+            android:layout_toRightOf="@id/edit_student_image"
+            android:layout_gravity="center_vertical"
+            app:floatingLabelTextAppearance="@style/TextAppearance.AppTheme.FloatingLabel">
 
-    </com.frederis.notsureifreading.widget.FloatingLabelLayout>
+            <EditText
+                android:id="@+id/edit_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionNext"
+                android:inputType="textPersonName"
+                android:textSize="24sp"
+                android:singleLine="true"
+                android:textColor="@android:color/white"
+                android:textColorHint="@color/body_text_1_inverse"
+                android:nextFocusDown="@+id/starting_word"
+                android:hint="Name"/>
 
-    <com.frederis.notsureifreading.widget.FloatingLabelLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dip"
-        app:floatingLabelTextAppearance="@style/TextAppearance.AppTheme.FloatingLabel">
+        </com.frederis.notsureifreading.widget.FloatingLabelLayout>
 
-        <EditText
-            android:id="@+id/last_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:imeOptions="actionNext"
-            android:nextFocusDown="@+id/starting_word"
-            android:hint="@string/last_name"/>
-
-    </com.frederis.notsureifreading.widget.FloatingLabelLayout>
+    </LinearLayout>
 
     <com.frederis.notsureifreading.widget.FloatingLabelLayout
         android:layout_width="match_parent"

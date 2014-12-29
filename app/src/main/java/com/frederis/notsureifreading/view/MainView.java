@@ -3,6 +3,7 @@ package com.frederis.notsureifreading.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.FrameLayout;
 
 import com.frederis.notsureifreading.MainBlueprint;
@@ -39,6 +40,7 @@ public class MainView extends FrameLayout implements CanShowScreen<TitledBluepri
 
     @Override
     public void showScreen(TitledBlueprint screen, Flow.Direction direction) {
+        Log.d("NSIR", "maestro, take it away!");
         screenMaestro.showScreen(screen, direction);
     }
 }

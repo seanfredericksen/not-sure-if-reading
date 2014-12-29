@@ -1,6 +1,7 @@
 package com.frederis.notsureifreading.view;
 
 import android.content.Context;
+import android.net.Uri;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -13,6 +14,8 @@ import com.frederis.notsureifreading.R;
 import com.frederis.notsureifreading.decoration.DividerItemDecoration;
 import com.frederis.notsureifreading.model.Student;
 import com.frederis.notsureifreading.util.SubscriptionUtil;
+import com.frederis.notsureifreading.widget.BezelImageView;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -58,7 +61,7 @@ public class StudentRecyclerView extends RecyclerView
         public void onBindViewHolder(ViewHolder viewHolder, int position) {
             final Student student = mStudents.get(position);
 
-            viewHolder.studentName.setText(mContext.getString(R.string.student_name, student.getFirstName(), student.getLastName()));
+            viewHolder.studentName.setText(student.getName());
             viewHolder.wordsDescription.setText(mContext.getString(R.string.words_description, student.getStartingWord(), student.getEndingWord()));
             viewHolder.row.setOnClickListener(new OnClickListener() {
                 @Override
@@ -66,6 +69,14 @@ public class StudentRecyclerView extends RecyclerView
                     mListener.onStudentSelected(student.getId());
                 }
             });
+
+            Picasso.with(mContext)
+                    .load(Uri.parse("asdf"))
+                    .placeholder(R.drawable.contact_picture_placeholder)
+                    .fit()
+                    .centerCrop()
+                    .tag(mContext)
+                    .into(viewHolder.studentImage);
         }
 
         @Override
@@ -83,6 +94,7 @@ public class StudentRecyclerView extends RecyclerView
             public View row;
             public TextView studentName;
             public TextView wordsDescription;
+            public BezelImageView studentImage;
 
             public ViewHolder(View view) {
                 super(view);
@@ -90,6 +102,7 @@ public class StudentRecyclerView extends RecyclerView
                 row = view;
                 studentName = (TextView) view.findViewById(R.id.student_name);
                 wordsDescription = (TextView) view.findViewById(R.id.sight_words_desc);
+                studentImage = (BezelImageView) view.findViewById(R.id.student_image);
             }
         }
 

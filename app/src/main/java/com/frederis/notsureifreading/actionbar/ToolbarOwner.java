@@ -7,25 +7,32 @@ import mortar.MortarScope;
 import mortar.Presenter;
 import rx.functions.Action0;
 
-public class ActionBarOwner extends Presenter<ActionBarOwner.View> {
+public class ToolbarOwner extends Presenter<ToolbarOwner.View> {
 
     public static class Config {
         public final boolean showHomeEnabled;
         public final boolean upButtonEnabled;
         public final CharSequence title;
         public final MenuAction action;
+        public final int elevationDimensionResId;
 
         public Config(boolean showHomeEnabled, boolean upButtonEnabled, CharSequence title,
-                      MenuAction action) {
+                      MenuAction action, int elevationDimensionResId) {
             this.showHomeEnabled = showHomeEnabled;
             this.upButtonEnabled = upButtonEnabled;
             this.title = title;
             this.action = action;
+            this.elevationDimensionResId = elevationDimensionResId;
         }
 
         public Config withAction(MenuAction action) {
-            return new Config(showHomeEnabled, upButtonEnabled, title, action);
+            return new Config(showHomeEnabled, upButtonEnabled, title, action, elevationDimensionResId);
         }
+
+        public Config withElevationDimension(int elevationDimensionResId) {
+            return new Config(showHomeEnabled, upButtonEnabled, title, action, elevationDimensionResId);
+        }
+
     }
 
     public static class MenuAction {
@@ -40,7 +47,7 @@ public class ActionBarOwner extends Presenter<ActionBarOwner.View> {
 
     private Config config;
 
-    ActionBarOwner() {
+    ToolbarOwner() {
     }
 
     @Override
@@ -72,6 +79,7 @@ public class ActionBarOwner extends Presenter<ActionBarOwner.View> {
         view.setUpButtonEnabled(config.upButtonEnabled);
         view.setTitle(config.title);
         view.setMenu(config.action);
+        view.setElevationDimension(config.elevationDimensionResId);
     }
 
     public interface View {
@@ -82,6 +90,8 @@ public class ActionBarOwner extends Presenter<ActionBarOwner.View> {
         void setTitle(CharSequence title);
 
         void setMenu(MenuAction action);
+
+        void setElevationDimension(int elevationDimensionResId);
 
         Context getMortarContext();
     }

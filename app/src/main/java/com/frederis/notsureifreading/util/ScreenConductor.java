@@ -72,6 +72,7 @@ public class ScreenConductor<S extends Blueprint> implements CanShowScreen<S> {
         int out = direction == Flow.Direction.FORWARD ? R.anim.slide_out_left : R.anim.slide_out_right;
         int in = direction == Flow.Direction.FORWARD ? R.anim.slide_in_right : R.anim.slide_in_left;
 
+
         oldChild.setAnimation(loadAnimation(context, out));
         newChild.setAnimation(loadAnimation(context, in));
     }

@@ -3,15 +3,13 @@ package com.frederis.notsureifreading.model;
 public class Student {
 
     private long mId;
-    private String mFirstName;
-    private String mLastName;
+    private String mName;
     private long mStartingWord;
     private long mEndingWord;
 
-    public Student(long id, String firstName, String lastName, long startingWord, long endingWord) {
+    public Student(long id, String name, long startingWord, long endingWord) {
         mId = id;
-        mFirstName = firstName;
-        mLastName = lastName;
+        mName = name;
         mStartingWord = startingWord;
         mEndingWord = endingWord;
     }
@@ -20,12 +18,8 @@ public class Student {
         return mId;
     }
 
-    public String getFirstName() {
-        return mFirstName;
-    }
-
-    public String getLastName() {
-        return mLastName;
+    public String getName() {
+        return mName;
     }
 
     public long getStartingWord() {
@@ -38,6 +32,7 @@ public class Student {
 
     @Override
     public String toString() {
-        return mFirstName + " " + mLastName;
+        return mName;
     }
+
 }

@@ -1,11 +1,12 @@
 package com.frederis.notsureifreading.screen;
 
+import android.net.Uri;
 import android.os.Bundle;
 
 import com.frederis.notsureifreading.MainBlueprint;
 import com.frederis.notsureifreading.MainScope;
 import com.frederis.notsureifreading.R;
-import com.frederis.notsureifreading.actionbar.ActionBarOwner;
+import com.frederis.notsureifreading.actionbar.ToolbarOwner;
 import com.frederis.notsureifreading.model.Student;
 import com.frederis.notsureifreading.model.Students;
 import com.frederis.notsureifreading.util.TitledBlueprint;
@@ -17,7 +18,6 @@ import dagger.Provides;
 import flow.Flow;
 import flow.HasParent;
 import flow.Layout;
-import mortar.Blueprint;
 import mortar.ViewPresenter;
 import rx.Observable;
 import rx.functions.Action0;
@@ -61,7 +61,7 @@ public class EditStudentScreen implements HasParent<StudentsListScreen>, TitledB
         Presenter providePresenter(Students students,
                                    Observable<Student> student,
                                    @MainScope Flow flow,
-                                   ActionBarOwner actionBar) {
+                                   ToolbarOwner actionBar) {
             return new Presenter(mStudentId, students, student, flow, actionBar);
         }
 
@@ -74,10 +74,9 @@ public class EditStudentScreen implements HasParent<StudentsListScreen>, TitledB
         private final Students students;
         private final Observable<Student> student;
         private final Flow flow;
-        private final ActionBarOwner actionBar;
+        private final ToolbarOwner actionBar;
 
-        private final Subject<String, String> firstName = BehaviorSubject.create();
-        private final Subject<String, String> lastName = BehaviorSubject.create();
+        private final Subject<String, String> name = BehaviorSubject.create();
         private final Subject<String, String> startingWord = BehaviorSubject.create();
         private final Subject<String, String> endingWord = BehaviorSubject.create();
 
@@ -85,7 +84,7 @@ public class EditStudentScreen implements HasParent<StudentsListScreen>, TitledB
                          Students students,
                          Observable<Student> student,
                          Flow flow,
-                         ActionBarOwner actionBar) {
+                         ToolbarOwner actionBar) {
             this.studentId = studentId;
             this.students = students;
             this.student = student;
@@ -102,22 +101,12 @@ public class EditStudentScreen implements HasParent<StudentsListScreen>, TitledB
             });
         }
 
-        private Observable<String> createFirstNameObservable() {
+        private Observable<String> createNameObservable() {
             return student
                     .map(new Func1<Student, String>() {
                         @Override
                         public String call(Student student) {
-                            return student.getFirstName();
-                        }
-                    });
-        }
-
-        private Observable<String> createLastNameObservable() {
-            return student
-                    .map(new Func1<Student, String>() {
-                        @Override
-                        public String call(Student student) {
-                            return student.getLastName();
+                            return student.getName();
                         }
                     });
         }
@@ -142,11 +131,10 @@ public class EditStudentScreen implements HasParent<StudentsListScreen>, TitledB
                     });
         }
 
-        public void updateOrInsertStudent(String firstName,
-                                          String lastName,
+        public void updateOrInsertStudent(String name,
                                           long startingWord,
                                           long endingWord) {
-            students.updateOrInsertStudent(new Student(studentId, firstName, lastName, startingWord, endingWord));
+            students.updateOrInsertStudent(new Student(studentId, name, startingWord, endingWord));
         }
 
         public void assessStudent() {
@@ -161,26 +149,25 @@ public class EditStudentScreen implements HasParent<StudentsListScreen>, TitledB
             final EditStudentView v = getView();
             if (v == null) return;
 
-            ActionBarOwner.Config actionBarConfig = actionBar.getConfig();
+            ToolbarOwner.Config actionBarConfig = actionBar.getConfig();
 
             actionBarConfig =
-                    actionBarConfig.withAction(new ActionBarOwner.MenuAction("Save", new Action0() {
+                    actionBarConfig.withAction(new ToolbarOwner.MenuAction("Save", new Action0() {
                         @Override
                         public void call() {
                             v.saveStudent();
                             flow.goBack();
                         }
-                    }));
+                    })).withElevationDimension(R.dimen.no_elevation);
 
             actionBar.setConfig(actionBarConfig);
 
-            createFirstNameObservable().subscribe(firstName);
-            createLastNameObservable().subscribe(lastName);
+            createNameObservable().subscribe(name);
             createStartingWordObservable().subscribe(startingWord);
             createEndingWordObservable().subscribe(endingWord);
 
-            v.populateFirstName(firstName);
-            v.populateLastName(lastName);
+            v.populateImage(Observable.just(Uri.parse("asdf")));
+            v.populateName(name);
             v.populateStartingWord(startingWord);
             v.populateEndingWord(endingWord);
         }
@@ -189,7 +176,7 @@ public class EditStudentScreen implements HasParent<StudentsListScreen>, TitledB
 
     @Override
     public CharSequence getTitle() {
-        return "Student Details";
+        return "";
     }
 
 }

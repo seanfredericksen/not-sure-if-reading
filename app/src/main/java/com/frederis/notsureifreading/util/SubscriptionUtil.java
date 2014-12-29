@@ -1,8 +1,14 @@
 package com.frederis.notsureifreading.util;
 
+import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.frederis.notsureifreading.R;
+import com.squareup.picasso.Picasso;
 
 import rx.Observable;
 import rx.Subscription;
@@ -19,6 +25,23 @@ public class SubscriptionUtil {
                     @Override
                     public void call(String s) {
                         textView.setText(s);
+                    }
+                });
+    }
+
+    static public <T extends Uri> Subscription subscribeStudentImage(final Observable<T> observable, final Context context, final ImageView imageView) {
+        return observable
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<T>() {
+                    @Override
+                    public void call(T data) {
+                        Picasso.with(context)
+                                .load(data)
+                                .placeholder(R.drawable.contact_picture_placeholder)
+                                .fit()
+                                .centerCrop()
+                                .tag(context)
+                                .into(imageView);
                     }
                 });
     }
@@ -45,6 +68,10 @@ public class SubscriptionUtil {
                         dataHandler.setData(data);
                     }
                 });
+    }
+
+    public static interface ImageDataHandler<T> {
+        void setData(T data);
     }
 
     public static interface ListDataHandler<T> {

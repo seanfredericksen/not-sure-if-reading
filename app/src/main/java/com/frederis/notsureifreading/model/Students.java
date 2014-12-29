@@ -37,8 +37,7 @@ public class Students {
 
     public long updateOrInsertStudent(Student student) {
         final ContentValues values = new ContentValues();
-        values.put(mStudentTable.getFirstNameColumn(), student.getFirstName());
-        values.put(mStudentTable.getLastNameColumn(), student.getLastName());
+        values.put(mStudentTable.getNameColumn(), student.getName());
         values.put(mStudentTable.getStartingWordColumn(), student.getStartingWord());
         values.put(mStudentTable.getEndingWordColumn(), student.getEndingWord());
 
@@ -115,8 +114,7 @@ public class Students {
             return new StudentCursor(mContext,
                     mDatabase.getReadableDatabase().query(mStudentTable.getTableName(),
                             new String[]{mStudentTable.getIdColumnName(),
-                                    mStudentTable.getFirstNameColumn(),
-                                    mStudentTable.getLastNameColumn(),
+                                    mStudentTable.getNameColumn(),
                                     mStudentTable.getStartingWordColumn(),
                                     mStudentTable.getEndingWordColumn()},
                             mStudentTable.getIdColumnName() + " = ?",
@@ -135,8 +133,7 @@ public class Students {
             StudentCursor cursor = new StudentCursor(mContext,
                     mDatabase.getReadableDatabase().query(mStudentTable.getTableName(),
                             new String[]{mStudentTable.getIdColumnName(),
-                                    mStudentTable.getFirstNameColumn(),
-                                    mStudentTable.getLastNameColumn(),
+                                    mStudentTable.getNameColumn(),
                                     mStudentTable.getStartingWordColumn(),
                                     mStudentTable.getEndingWordColumn()},
                             null,
@@ -166,8 +163,7 @@ public class Students {
         StudentCursor cursor = new StudentCursor(mContext,
                 mDatabase.getReadableDatabase().query(mStudentTable.getTableName(),
                         new String[]{mStudentTable.getIdColumnName(),
-                                mStudentTable.getFirstNameColumn(),
-                                mStudentTable.getLastNameColumn(),
+                                mStudentTable.getNameColumn(),
                                 mStudentTable.getStartingWordColumn(),
                                 mStudentTable.getEndingWordColumn()},
                         null,
@@ -193,8 +189,7 @@ public class Students {
         StudentCursor cursor = new StudentCursor(mContext,
                 mDatabase.getReadableDatabase().query(mStudentTable.getTableName(),
                         new String[]{mStudentTable.getIdColumnName(),
-                                mStudentTable.getFirstNameColumn(),
-                                mStudentTable.getLastNameColumn(),
+                                mStudentTable.getNameColumn(),
                                 mStudentTable.getStartingWordColumn(),
                                 mStudentTable.getEndingWordColumn()},
                         mStudentTable.getIdColumnName() + " = ?",
@@ -205,7 +200,7 @@ public class Students {
 
         Student student = cursor.moveToFirst()
                 ? constructStudent(cursor)
-                : new Student(0L, "", "", 0L, 0L);
+                : new Student(0L, "", 0L, 0L);
 
         cursor.close();
 
@@ -219,8 +214,7 @@ public class Students {
             StudentCursor cursor = new StudentCursor(mContext,
                     mDatabase.getReadableDatabase().query(mStudentTable.getTableName(),
                             new String[]{mStudentTable.getIdColumnName(),
-                                    mStudentTable.getFirstNameColumn(),
-                                    mStudentTable.getLastNameColumn(),
+                                    mStudentTable.getNameColumn(),
                                     mStudentTable.getStartingWordColumn(),
                                     mStudentTable.getEndingWordColumn()},
                             mStudentTable.getIdColumnName() + " = ?",
@@ -231,7 +225,7 @@ public class Students {
 
             Student student = cursor.moveToFirst()
                     ? constructStudent(cursor)
-                    : new Student(0L, "", "", 0L, 0L);
+                    : new Student(0L, "", 0L, 0L);
 
             cursor.close();
 
@@ -242,8 +236,7 @@ public class Students {
 
     private Student constructStudent(StudentCursor cursor) {
         return new Student(cursor.getId(),
-                cursor.getFirstName(),
-                cursor.getLastName(),
+                cursor.getName(),
                 cursor.getStartingWord(),
                 cursor.getEndingWord());
     }

@@ -14,5 +14,6 @@
     <dimen name="add_to_schedule_button_height_no_padding">40dp</dimen>
     <dimen name="keyline_1">16dp</dimen>
     <dimen name="keyline_1_minus_8dp">8dp</dimen>
-
+    <dimen name="toolbar_elevation">2dp</dimen>
+    <dimen name="no_elevation">0dp</dimen>
 </resources>
