@@ -56,22 +56,22 @@ public class PerformAssessmentView extends ViewPager
 
         private Context mContext;
         private LUtils mLUtils;
-        private ArrayList<Word> mWords;
+        private ArrayList<WordAssessment> mWordAssessments;
 
-        public Adapter(Context context, ArrayList<Word> words) {
+        public Adapter(Context context, ArrayList<WordAssessment> wordAssessments) {
             mContext = context;
             mLUtils = new LUtils(context);
-            mWords = words;
+            mWordAssessments = wordAssessments;
         }
 
         @Override
         public int getCount() {
-            return mWords.size();
+            return mWordAssessments.size();
         }
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            View view = getView(mContext, container, mWords.get(position));
+            View view = getView(mContext, container, mWordAssessments.get(position));
 
             view.setTag(position);
 
@@ -80,25 +80,32 @@ public class PerformAssessmentView extends ViewPager
             return view;
         }
 
-        public View getView(Context context, ViewGroup container, Word word) {
+        public View getView(Context context, ViewGroup container, WordAssessment assessment) {
             View view = LayoutInflater.from(context).inflate(R.layout.perform_assessment_page_view, container, false);
 
-            bindView(view, word);
+            bindView(view, assessment);
 
             return view;
         }
 
-        public void bindView(View view, Word word) {
-            ((TextView) view.findViewById(R.id.word_name)).setText(word.getText());
+        public void bindView(View view, final WordAssessment assessment) {
+            ((TextView) view.findViewById(R.id.word_name)).setText(assessment.word.getText());
 
             final CheckableFrameLayout wordIdentifiedButton = (CheckableFrameLayout) view.findViewById(R.id.word_identified_button);
             final ImageView wordIdentifiedIcon = (ImageView) wordIdentifiedButton.findViewById(R.id.word_identified_icon);
 
+            wordIdentifiedButton.setChecked(assessment.isCorrect, false);
+            mLUtils.setOrAnimateWordIdentifiedIcon(wordIdentifiedIcon, assessment.isCorrect, false);
+
             wordIdentifiedButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    wordIdentifiedButton.setChecked(true, true);
-                    mLUtils.setOrAnimateWordIdentifiedIcon(wordIdentifiedIcon, true, true);
+                    boolean isChecked = !wordIdentifiedButton.isChecked();
+
+                    wordIdentifiedButton.setChecked(isChecked, true);
+                    mLUtils.setOrAnimateWordIdentifiedIcon(wordIdentifiedIcon, isChecked, true);
+
+                    assessment.isCorrect = isChecked;
                 }
             });
         }
@@ -113,12 +120,35 @@ public class PerformAssessmentView extends ViewPager
             return view == object;
         }
 
+        public static ArrayList<WordAssessment> buildAssessments(ArrayList<Word> words) {
+            ArrayList<WordAssessment> assessments = new ArrayList<>();
+
+            for (Word word : words) {
+                assessments.add(new WordAssessment(word));
+            }
+
+            return assessments;
+        }
+
+        public static class WordAssessment {
+            Word word;
+            boolean isCorrect;
+
+            public WordAssessment(Word word) {
+                this(word, false);
+            }
+
+            public WordAssessment(Word word, boolean correct) {
+                this.word = word;
+                this.isCorrect = correct;
+            }
+        }
 
     }
 
     @Override
     public void setData(ArrayList<Word> data) {
-        setAdapter(new Adapter(getContext(), data));
+        setAdapter(new Adapter(getContext(), Adapter.buildAssessments(data)));
     }
 
 }
