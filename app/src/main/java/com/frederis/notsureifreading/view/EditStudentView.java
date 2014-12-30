@@ -28,7 +28,9 @@ public class EditStudentView extends LinearLayout {
     private final EditText mName;
     private final EditText mStartingWord;
     private final EditText mEndingWord;
-    private final Button mAssess;
+    private final Button mCancel;
+    private final Button mSave;
+//    private final Button mAssess;
 
     private final CompositeSubscription mCompositeSubscription;
 
@@ -43,12 +45,35 @@ public class EditStudentView extends LinearLayout {
         mName = (EditText) findViewById(R.id.edit_name);
         mStartingWord = (EditText) findViewById(R.id.starting_word);
         mEndingWord = (EditText) findViewById(R.id.ending_word);
-        mAssess = (Button) findViewById(R.id.assess_button);
+        mCancel = (Button) findViewById(R.id.cancel_button);
+        mSave = (Button) findViewById(R.id.save_button);
+//        mAssess = (Button) findViewById(R.id.assess_button);
+//
+//        mAssess.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                mPresenter.assessStudent();
+//            }
+//        });
 
-        mAssess.setOnClickListener(new OnClickListener() {
+        mStudentImage.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPresenter.assessStudent();
+                mPresenter.captureImage();
+            }
+        });
+
+        mCancel.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPresenter.exit();
+            }
+        });
+
+        mSave.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveStudent();
             }
         });
 
@@ -73,6 +98,7 @@ public class EditStudentView extends LinearLayout {
         mPresenter.updateOrInsertStudent(mName.getText().toString(),
                 Long.valueOf(mStartingWord.getText().toString()),
                 Long.valueOf(mEndingWord.getText().toString()));
+        mPresenter.exit();
     }
 
     public void populateImage(Observable<Uri> imageUri) {

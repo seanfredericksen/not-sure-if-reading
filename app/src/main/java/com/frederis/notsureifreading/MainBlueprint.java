@@ -5,11 +5,13 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 
-import com.frederis.notsureifreading.actionbar.ActionBarModule;
 import com.frederis.notsureifreading.actionbar.ToolbarOwner;
 import com.frederis.notsureifreading.model.Words;
+import com.frederis.notsureifreading.presenter.ActivityResultPresenter;
+import com.frederis.notsureifreading.presenter.ActivityResultRegistrar;
 import com.frederis.notsureifreading.screen.StudentsListScreen;
 import com.frederis.notsureifreading.util.FlowOwner;
+import com.frederis.notsureifreading.util.StartActivityForResultHandler;
 import com.frederis.notsureifreading.util.TitledBlueprint;
 import com.frederis.notsureifreading.view.MainView;
 
@@ -25,6 +27,12 @@ import mortar.Blueprint;
 
 public class MainBlueprint implements Blueprint {
 
+    private StartActivityForResultHandler mImageHandler;
+
+    public MainBlueprint(StartActivityForResultHandler startActivityForResultHandler) {
+        mImageHandler = startActivityForResultHandler;
+    }
+
     @Override
     public String getMortarScopeName() {
         return getClass().getName();
@@ -36,16 +44,37 @@ public class MainBlueprint implements Blueprint {
     }
 
     @dagger.Module( //
-            includes = ActionBarModule.class,
-            injects = MainView.class,
+            injects = {MainActivity.class, MainView.class},
             addsTo = ApplicationModule.class, //
             library = true //
     )
-    public static class Module {
+    public class Module {
         @Provides
         @MainScope
         Flow provideFlow(Presenter presenter) {
             return presenter.getFlow();
+        }
+
+        @Provides
+        StartActivityForResultHandler provideStudentImageHandler() {
+            return mImageHandler;
+        }
+
+        @Provides
+        @Singleton
+        ToolbarOwner provideActionBarOwner() {
+            return new ToolbarOwner();
+        }
+
+        @Provides
+        @Singleton
+        ActivityResultPresenter provideActivityResultPresenter() {
+            return new ActivityResultPresenter();
+        }
+
+        @Provides
+        ActivityResultRegistrar provideActivityResultRegistrar(ActivityResultPresenter presenter) {
+            return presenter;
         }
     }
 

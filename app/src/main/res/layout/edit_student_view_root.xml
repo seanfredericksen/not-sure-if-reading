@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/edit_student_image"
             android:layout_gravity="center_vertical"
-            app:floatingLabelTextAppearance="@style/TextAppearance.AppTheme.FloatingLabel">
+            app:floatingLabelTextAppearance="@style/TextAppearance.AppTheme.FloatingLabelToolbar">
 
             <EditText
                 android:id="@+id/edit_name"
@@ -51,46 +51,101 @@
 
     </LinearLayout>
 
-    <com.frederis.notsureifreading.widget.FloatingLabelLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dip"
-        app:floatingLabelTextAppearance="@style/TextAppearance.AppTheme.FloatingLabel">
+        android:layout_height="0dip"
+        android:layout_weight="1">
 
-        <EditText
-            android:id="@+id/starting_word"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:imeOptions="actionNext"
-            android:nextFocusDown="@+id/ending_word"
-            android:singleLine="true"
-            android:hint="@string/starting_word_hint"/>
+            android:orientation="vertical">
 
-    </com.frederis.notsureifreading.widget.FloatingLabelLayout>
+            <com.frederis.notsureifreading.widget.FloatingLabelLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dip"
+                android:paddingLeft="16dip"
+                android:paddingRight="16dip"
+                app:floatingLabelTextAppearance="@style/TextAppearance.AppTheme.FloatingLabel">
 
-    <com.frederis.notsureifreading.widget.FloatingLabelLayout
+                <EditText
+                    android:id="@+id/starting_word"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:imeOptions="actionNext"
+                    android:inputType="number"
+                    android:nextFocusDown="@+id/ending_word"
+                    android:textColor="@color/body_text_1"
+                    android:singleLine="true"
+                    android:hint="@string/starting_word_hint"/>
+
+            </com.frederis.notsureifreading.widget.FloatingLabelLayout>
+
+            <com.frederis.notsureifreading.widget.FloatingLabelLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="16dip"
+                android:paddingRight="16dip"
+                android:layout_marginTop="12dip"
+                app:floatingLabelTextAppearance="@style/TextAppearance.AppTheme.FloatingLabel">
+
+                <EditText
+                    android:id="@+id/ending_word"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:imeOptions="actionDone"
+                    android:inputType="number"
+                    android:textColor="@color/body_text_1"
+                    android:singleLine="true"
+                    android:hint="@string/ending_word_hint"/>
+
+            </com.frederis.notsureifreading.widget.FloatingLabelLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <View
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dip"
-        app:floatingLabelTextAppearance="@style/TextAppearance.AppTheme.FloatingLabel">
+        android:layout_height="1dip"
+        android:background="@color/divider"/>
 
-        <EditText
-            android:id="@+id/ending_word"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:imeOptions="actionDone"
-            android:hint="@string/ending_word_hint"/>
-
-    </com.frederis.notsureifreading.widget.FloatingLabelLayout>
-
-    <Button
-        android:id="@+id/assess_button"
+    <LinearLayout
+        android:layout_marginTop="6dip"
+        android:layout_gravity="right"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="14dip"
-        android:minHeight="56dip"
-        android:padding="15dip"
-        android:layout_gravity="center_horizontal"
-        android:text="ASSESS"/>
+        android:paddingRight="12dip"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/cancel_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="64dip"
+            android:layout_marginTop="14dip"
+            style="?android:attr/borderlessButtonStyle"
+            android:minHeight="48dip"
+            android:textColor="@color/accent_dark"
+            android:layout_marginRight="8dip"
+            android:padding="8dip"
+            android:layout_gravity="center_horizontal"
+            android:text="CANCEL"/>
+
+        <Button
+            style="?android:attr/borderlessButtonStyle"
+            android:id="@+id/save_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dip"
+            android:minWidth="64dip"
+            android:textColor="@color/accent_dark"
+            android:minHeight="48dip"
+            android:padding="8dip"
+            android:layout_gravity="center_horizontal"
+            android:text="SAVE"/>
+
+    </LinearLayout>
 
 </merge>

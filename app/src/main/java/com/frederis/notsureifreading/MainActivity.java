@@ -1,24 +1,26 @@
 package com.frederis.notsureifreading;
 
-import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
-import android.transition.Scene;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.frederis.notsureifreading.actionbar.ToolbarOwner;
+import com.frederis.notsureifreading.presenter.ActivityResultPresenter;
+import com.frederis.notsureifreading.presenter.ActivityResultProvider;
+import com.frederis.notsureifreading.util.StartActivityForResultHandler;
 import com.frederis.notsureifreading.view.MainView;
 
-import flow.Flow;
 import javax.inject.Inject;
+
+import flow.Flow;
 import mortar.Mortar;
 import mortar.MortarActivityScope;
 import mortar.MortarScope;
@@ -28,13 +30,22 @@ import static android.content.Intent.ACTION_MAIN;
 import static android.content.Intent.CATEGORY_LAUNCHER;
 import static android.view.MenuItem.SHOW_AS_ACTION_ALWAYS;
 
-public class MainActivity extends ActionBarActivity implements ToolbarOwner.View {
+public class MainActivity extends ActionBarActivity implements ToolbarOwner.View, StartActivityForResultHandler, ActivityResultProvider {
+
+    static final String IMAGE_CAPTURE_URI = "imageCaptureUri";
+    static final String IMAGE_CAPTURE_STUDENT_ID = "imageCaptureStudentId";
+
     private MortarActivityScope activityScope;
     private ToolbarOwner.MenuAction actionBarMenuAction;
     private Toolbar mToolbar;
 
     @Inject ToolbarOwner toolbarOwner;
+    @Inject ActivityResultPresenter activityResultPresenter;
+
     private Flow mainFlow;
+
+    private Uri mImageCaptureUri;
+    private long mImageCaptureStudentId;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,10 +56,15 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
         }
 
         MortarScope parentScope = Mortar.getScope(getApplication());
-        activityScope = Mortar.requireActivityScope(parentScope, new MainBlueprint());
+        activityScope = Mortar.requireActivityScope(parentScope, new MainBlueprint(this));
         Mortar.inject(this, this);
 
         activityScope.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            mImageCaptureUri = savedInstanceState.getParcelable(IMAGE_CAPTURE_URI);
+            mImageCaptureStudentId = savedInstanceState.getLong(IMAGE_CAPTURE_STUDENT_ID);
+        }
+
         setContentView(R.layout.activity_main);
         MainView mainView = (MainView) findViewById(R.id.container);
         mainFlow = mainView.getFlow();
@@ -57,6 +73,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
         setSupportActionBar(mToolbar);
 
         toolbarOwner.takeView(this);
+        activityResultPresenter.takeView(this);
     }
 
     @Override public Object getSystemService(String name) {
@@ -69,6 +86,9 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
     @Override protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         activityScope.onSaveInstanceState(outState);
+
+        outState.putParcelable(IMAGE_CAPTURE_URI, mImageCaptureUri);
+        outState.putLong(IMAGE_CAPTURE_STUDENT_ID, mImageCaptureStudentId);
     }
 
     /** Inform the view about back events. */
@@ -100,7 +120,8 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
         }
         menu.add("Log Scope Hierarchy")
                 .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                    @Override public boolean onMenuItemClick(MenuItem item) {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
                         Log.d("DemoActivity", MortarScopeDevHelper.scopeHierarchyToString(activityScope));
                         return true;
                     }
@@ -112,6 +133,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
         super.onDestroy();
 
         toolbarOwner.dropView(this);
+        activityResultPresenter.dropView(this);
 
         // activityScope may be null in case isWrongInstance() returned true in onCreate()
         if (isFinishing() && activityScope != null) {
@@ -165,5 +187,19 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
             return intent.hasCategory(CATEGORY_LAUNCHER) && isMainAction;
         }
         return false;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (!activityResultPresenter.onActivityResult(requestCode, resultCode, data)) {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+
+
+    @Override
+    public MortarScope getMortarScope() {
+        return activityScope;
     }
 }

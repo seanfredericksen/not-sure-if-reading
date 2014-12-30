@@ -2,6 +2,7 @@ package com.frederis.notsureifreading.model;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
 
 import com.frederis.notsureifreading.ForApplication;
@@ -10,7 +11,6 @@ import com.frederis.notsureifreading.database.cursor.StudentCursor;
 import com.frederis.notsureifreading.database.table.StudentTable;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -40,6 +40,11 @@ public class Students {
         values.put(mStudentTable.getNameColumn(), student.getName());
         values.put(mStudentTable.getStartingWordColumn(), student.getStartingWord());
         values.put(mStudentTable.getEndingWordColumn(), student.getEndingWord());
+
+        Uri imageUri = student.getImageUri();
+        if (imageUri != Student.IMAGE_UNCHANGED) {
+            values.put(mStudentTable.getImageUriColumn(), imageUri != null ? imageUri.toString() : null);
+        }
 
         long id = (student.getId() == 0L)
                 ? insertStudent(values)
@@ -115,6 +120,7 @@ public class Students {
                     mDatabase.getReadableDatabase().query(mStudentTable.getTableName(),
                             new String[]{mStudentTable.getIdColumnName(),
                                     mStudentTable.getNameColumn(),
+                                    mStudentTable.getImageUriColumn(),
                                     mStudentTable.getStartingWordColumn(),
                                     mStudentTable.getEndingWordColumn()},
                             mStudentTable.getIdColumnName() + " = ?",
@@ -134,6 +140,7 @@ public class Students {
                     mDatabase.getReadableDatabase().query(mStudentTable.getTableName(),
                             new String[]{mStudentTable.getIdColumnName(),
                                     mStudentTable.getNameColumn(),
+                                    mStudentTable.getImageUriColumn(),
                                     mStudentTable.getStartingWordColumn(),
                                     mStudentTable.getEndingWordColumn()},
                             null,
@@ -164,6 +171,7 @@ public class Students {
                 mDatabase.getReadableDatabase().query(mStudentTable.getTableName(),
                         new String[]{mStudentTable.getIdColumnName(),
                                 mStudentTable.getNameColumn(),
+                                mStudentTable.getImageUriColumn(),
                                 mStudentTable.getStartingWordColumn(),
                                 mStudentTable.getEndingWordColumn()},
                         null,
@@ -190,6 +198,7 @@ public class Students {
                 mDatabase.getReadableDatabase().query(mStudentTable.getTableName(),
                         new String[]{mStudentTable.getIdColumnName(),
                                 mStudentTable.getNameColumn(),
+                                mStudentTable.getImageUriColumn(),
                                 mStudentTable.getStartingWordColumn(),
                                 mStudentTable.getEndingWordColumn()},
                         mStudentTable.getIdColumnName() + " = ?",
@@ -200,7 +209,7 @@ public class Students {
 
         Student student = cursor.moveToFirst()
                 ? constructStudent(cursor)
-                : new Student(0L, "", 0L, 0L);
+                : new Student(0L, "", Uri.EMPTY, 0L, 0L);
 
         cursor.close();
 
@@ -215,6 +224,7 @@ public class Students {
                     mDatabase.getReadableDatabase().query(mStudentTable.getTableName(),
                             new String[]{mStudentTable.getIdColumnName(),
                                     mStudentTable.getNameColumn(),
+                                    mStudentTable.getImageUriColumn(),
                                     mStudentTable.getStartingWordColumn(),
                                     mStudentTable.getEndingWordColumn()},
                             mStudentTable.getIdColumnName() + " = ?",
@@ -225,7 +235,7 @@ public class Students {
 
             Student student = cursor.moveToFirst()
                     ? constructStudent(cursor)
-                    : new Student(0L, "", 0L, 0L);
+                    : new Student(0L, "", Uri.EMPTY, 0L, 0L);
 
             cursor.close();
 
@@ -237,6 +247,7 @@ public class Students {
     private Student constructStudent(StudentCursor cursor) {
         return new Student(cursor.getId(),
                 cursor.getName(),
+                cursor.getImageUri(),
                 cursor.getStartingWord(),
                 cursor.getEndingWord());
     }

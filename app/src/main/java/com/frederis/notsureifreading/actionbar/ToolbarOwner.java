@@ -47,7 +47,7 @@ public class ToolbarOwner extends Presenter<ToolbarOwner.View> {
 
     private Config config;
 
-    ToolbarOwner() {
+    public ToolbarOwner() {
     }
 
     @Override

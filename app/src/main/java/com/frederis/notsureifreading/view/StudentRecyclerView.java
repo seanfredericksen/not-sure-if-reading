@@ -71,7 +71,7 @@ public class StudentRecyclerView extends RecyclerView
             });
 
             Picasso.with(mContext)
-                    .load(Uri.parse("asdf"))
+                    .load(student.getImageUri())
                     .placeholder(R.drawable.contact_picture_placeholder)
                     .fit()
                     .centerCrop()

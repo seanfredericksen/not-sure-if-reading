@@ -20,6 +20,7 @@ public class StudentTable extends DatabaseTable {
         new Builder(database)
                 .withTableName(getTableName())
                 .withStringColumn(getNameColumn(), true, true)
+                .withStringColumn(getImageUriColumn(), false, false)
                 .withForeignIdColumn(getStartingWordColumn(), mWordTable.getIdReference(), false)
                 .withForeignIdColumn(getEndingWordColumn(), mWordTable.getIdReference(), false)
                 .create();
@@ -27,6 +28,10 @@ public class StudentTable extends DatabaseTable {
 
     public String getNameColumn() {
         return "name";
+    }
+
+    public String getImageUriColumn() {
+        return "imageUri";
     }
 
     public String getStartingWordColumn() {

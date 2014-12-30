@@ -3,6 +3,7 @@ package com.frederis.notsureifreading.database.cursor;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.CursorWrapper;
+import android.net.Uri;
 
 import com.frederis.notsureifreading.database.table.StudentTable;
 
@@ -26,6 +27,12 @@ public class StudentCursor extends CursorWrapper {
 
     public String getName() {
         return getString(getColumnIndex(mStudentTable.getNameColumn()));
+    }
+
+    public Uri getImageUri() {
+        String uriString = getString(getColumnIndex(mStudentTable.getImageUriColumn()));
+
+        return uriString != null ? Uri.parse(uriString) : Uri.EMPTY;
     }
 
     public long getStartingWord() {

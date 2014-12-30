@@ -40,7 +40,6 @@ public class MainView extends FrameLayout implements CanShowScreen<TitledBluepri
 
     @Override
     public void showScreen(TitledBlueprint screen, Flow.Direction direction) {
-        Log.d("NSIR", "maestro, take it away!");
         screenMaestro.showScreen(screen, direction);
     }
 }
