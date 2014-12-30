@@ -2,25 +2,55 @@ package com.frederis.notsureifreading.model;
 
 public class Assessment {
 
-    private final String mTitle;
     private final long mId;
+    private final long mStudentId;
+    private final long mDate;
+    private final long mStartingWord;
+    private final long mEndingWord;
+    private final long mOneToFiftyResult;
+    private final long mFiftyOneToOneHundredResult;
 
-    Assessment(long id, String title) {
+    public Assessment(long id,
+               long studentId,
+               long date,
+               long startingWord,
+               long endingWord,
+               long oneToFiftyResult,
+               long fiftyOneToOneHundredResult) {
         mId = id;
-        mTitle = title;
+        mStudentId = studentId;
+        mDate = date;
+        mStartingWord = startingWord;
+        mEndingWord = endingWord;
+        mOneToFiftyResult = oneToFiftyResult;
+        mFiftyOneToOneHundredResult = fiftyOneToOneHundredResult;
     }
 
     public long getId() {
         return mId;
     }
 
-    public String getTitle() {
-        return mTitle;
+    public long getStudentId() {
+        return mStudentId;
     }
 
-    @Override
-    public String toString() {
-        return mTitle;
+    public long getDate() {
+        return mDate;
     }
 
+    public long getStartingWord() {
+        return mStartingWord;
+    }
+
+    public long getEndingWord() {
+        return mEndingWord;
+    }
+
+    public long getOneToFiftyResult() {
+        return mOneToFiftyResult;
+    }
+
+    public long getFiftyOneToOneHundredResult() {
+        return mFiftyOneToOneHundredResult;
+    }
 }

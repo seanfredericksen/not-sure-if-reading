@@ -1,21 +1,5 @@
 package com.frederis.notsureifreading.screen;
 
-/*
- * Copyright 2013 Square Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import android.os.Bundle;
 
 import com.frederis.notsureifreading.MainBlueprint;
@@ -25,6 +9,7 @@ import com.frederis.notsureifreading.model.Assessments;
 import com.frederis.notsureifreading.util.TitledBlueprint;
 import com.frederis.notsureifreading.view.RecentAssessmentListView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -54,7 +39,7 @@ public class RecentAssessmentListScreen implements TitledBlueprint {
     static class Module {
 
         @Provides
-        List<Assessment> provideAssessments(Assessments assessments) {
+        Observable<ArrayList<Assessment>> provideAssessments(Assessments assessments) {
             return assessments.getAll();
         }
 
@@ -64,10 +49,10 @@ public class RecentAssessmentListScreen implements TitledBlueprint {
     public static class Presenter extends ViewPresenter<RecentAssessmentListView> {
 
         private final Flow mFlow;
-        private final List<Assessment> mAssessments;
+        private final Observable<ArrayList<Assessment>> mAssessments;
 
         @Inject
-        Presenter(Flow flow, List<Assessment> assessments) {
+        Presenter(Flow flow, Observable<ArrayList<Assessment>> assessments) {
             mFlow = flow;
             mAssessments = assessments;
         }

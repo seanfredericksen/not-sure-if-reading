@@ -56,7 +56,7 @@ public class AssessmentScreen implements HasParent<RecentAssessmentListScreen>, 
 
         @Provides
         Observable<Assessment> provideAssessment(Assessments assessments) {
-            return assessments.getAssessment(mAssessmentId);
+            return null;
         }
 
     }
@@ -96,16 +96,6 @@ public class AssessmentScreen implements HasParent<RecentAssessmentListScreen>, 
                     });
         }
 
-        private Observable<String> createAssessmentNameObservable() {
-            return assessment
-                    .map(new Func1<Assessment, String>() {
-                        @Override
-                        public String call(Assessment assessment) {
-                            return assessment.getTitle();
-                        }
-                    });
-        }
-
         @Override public void onLoad(Bundle savedInstanceState) {
             final AssessmentView v = getView();
             if (v == null) return;
@@ -121,17 +111,9 @@ public class AssessmentScreen implements HasParent<RecentAssessmentListScreen>, 
             actionBar.setConfig(actionBarConfig);
 
             createAssessmentIdObservable().subscribe(assessmentId);
-            createAssessmentNameObservable().subscribe(assessmentName);
 
             v.showAssessmentId(assessmentId);
             v.showAssessmentName(assessmentName);
-
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    assessments.update();
-                }
-            }, 5000);
         }
 
         @Override protected void onExitScope() {

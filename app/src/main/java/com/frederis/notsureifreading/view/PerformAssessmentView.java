@@ -29,6 +29,8 @@ public class PerformAssessmentView extends ViewPager
 
     @Inject PerformAssessmentScreen.Presenter mPresenter;
 
+    private Adapter mAdapter;
+
     public PerformAssessmentView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
@@ -50,6 +52,39 @@ public class PerformAssessmentView extends ViewPager
 
     public void showWords(Observable<ArrayList<Word>> words) {
         SubscriptionUtil.subscribeViewPager(words, this);
+    }
+
+    public long getStartingWord() {
+        return mAdapter.getData().get(0).word.getId();
+    }
+
+    public long getEndingWord() {
+        ArrayList<Adapter.WordAssessment> data = mAdapter.getData();
+        return data.get(data.size() - 1).word.getId();
+    }
+
+    public long get1To50Results() {
+        ArrayList<Adapter.WordAssessment> data = mAdapter.getData();
+
+        long result = 0L;
+
+        for (int i = 0; i < 50; i++) {
+            result = (result << 1) | ((i < data.size() && data.get(i).isCorrect) ? 1 : 0);
+        }
+
+        return result;
+    }
+
+    public long get51To100Results() {
+        ArrayList<Adapter.WordAssessment> data = mAdapter.getData();
+
+        long result = 0L;
+
+        for (int i = 50; i < 100; i++) {
+            result = (result << 1) | ((i < data.size() && data.get(i).isCorrect) ? 1 : 0);
+        }
+
+        return result;
     }
 
     public static class Adapter extends PagerAdapter {
@@ -78,6 +113,10 @@ public class PerformAssessmentView extends ViewPager
             container.addView(view);
 
             return view;
+        }
+
+        public ArrayList<WordAssessment> getData() {
+            return mWordAssessments;
         }
 
         public View getView(Context context, ViewGroup container, WordAssessment assessment) {
@@ -148,7 +187,8 @@ public class PerformAssessmentView extends ViewPager
 
     @Override
     public void setData(ArrayList<Word> data) {
-        setAdapter(new Adapter(getContext(), Adapter.buildAssessments(data)));
+        mAdapter = new Adapter(getContext(), Adapter.buildAssessments(data));
+        setAdapter(mAdapter);
     }
 
 }

@@ -33,6 +33,7 @@ import flow.Layout;
 import mortar.MortarScope;
 import mortar.ViewPresenter;
 import rx.Observable;
+import rx.functions.Action0;
 import rx.functions.Func1;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.Subject;
@@ -253,7 +254,14 @@ public class EditStudentScreen implements HasParent<StudentsListScreen>, TitledB
 
             ToolbarOwner.Config actionBarConfig = actionBar.getConfig();
 
-            actionBarConfig = actionBarConfig.withElevationDimension(R.dimen.no_elevation);
+            actionBarConfig = actionBarConfig
+                    .withAction(new ToolbarOwner.MenuAction("ASSESS", new Action0() {
+                        @Override
+                        public void call() {
+                            assessStudent();
+                        }
+                    }))
+                    .withElevationDimension(R.dimen.no_elevation);
 
             actionBar.setConfig(actionBarConfig);
 
