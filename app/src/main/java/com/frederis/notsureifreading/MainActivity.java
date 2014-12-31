@@ -107,7 +107,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
         }
 
         if (item.getItemId() == android.R.id.home) {
-            return mainFlow.goUp();
+            return mainFlow.goUp() || mainFlow.goBack();
         }
 
         return super.onOptionsItemSelected(item);

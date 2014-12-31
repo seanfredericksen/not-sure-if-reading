@@ -73,7 +73,6 @@ public class ScreenConductor<S extends Blueprint> implements CanShowScreen<S>, C
                         transitions = Transitions.forward(context, newScreen);
                         break;
                     case BACKWARD:
-                        Log.d("NSIR", "Going backward!");
                         if (newScreen instanceof TransitionScreen) {
                             // Try to load animations from a screen and set them
                             int[] transitionIds = ((TransitionScreen) newScreen).getTransitions();
@@ -85,7 +84,6 @@ public class ScreenConductor<S extends Blueprint> implements CanShowScreen<S>, C
                         }
                         break;
                     case REPLACE:
-                        Log.d("NSIR", "Replacing");
                         // no animations
                         break;
                 }
@@ -100,6 +98,11 @@ public class ScreenConductor<S extends Blueprint> implements CanShowScreen<S>, C
                     screenTransition = new AnimatorSet();
                     screenTransition.playTogether(transitions.out, transitions.in);
                     screenTransition.addListener(new SimpleAnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+                            contentContainer.addView(newChild);
+                        }
+
                         @Override public void onAnimationEnd(Animator animation) {
                             contentContainer.removeView(oldChild);
                         }
@@ -110,11 +113,10 @@ public class ScreenConductor<S extends Blueprint> implements CanShowScreen<S>, C
                 }
             }
 
-            contentContainer.addView(newChild);
-
             if (screenTransition != null) {
-                Log.d("NSIR", "Starting transition!");
                 screenTransition.start();
+            } else {
+                contentContainer.addView(newChild);
             }
 
             // Makes the new view z-index higher than the old view
