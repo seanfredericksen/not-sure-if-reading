@@ -19,7 +19,7 @@ import javax.inject.Inject;
 import mortar.Mortar;
 import rx.Observable;
 
-public class StudentListView extends FrameLayout {
+public class StudentListView extends FractionalFrameLayout {
 
     @Inject StudentsListScreen.Presenter mPresenter;
 
@@ -43,7 +43,6 @@ public class StudentListView extends FrameLayout {
         super(context, attrs, defStyleAttr, defStyleRes);
 
         initialize(context);
-
     }
 
     @Override

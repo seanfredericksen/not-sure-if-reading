@@ -26,12 +26,13 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:21.0.2'
 
     compile 'com.squareup.mortar:mortar:0.16'
-    compile 'com.squareup.flow:flow:0.8'
-    compile 'com.squareup.dagger:dagger:1.2.2'
+    compile 'com.squareup.flow:flow:0.7'
+    compile 'com.jakewharton.timber:timber:2.2.2'
 
     compile 'com.squareup.picasso:picasso:2.4.0'
 
-    provided 'com.squareup.dagger:dagger-compiler:1.2.2'
+    compile 'com.squareup.dagger:dagger:1.2.1'
+    provided 'com.squareup.dagger:dagger-compiler:1.2.1'
 
     compile 'com.jakewharton:butterknife:5.1.2'
     compile 'com.google.code.gson:gson:2.3'

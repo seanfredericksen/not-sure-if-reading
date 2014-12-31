@@ -2,21 +2,25 @@ package com.frederis.notsureifreading;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.frederis.notsureifreading.actionbar.DrawerPresenter;
 import com.frederis.notsureifreading.actionbar.ToolbarOwner;
 import com.frederis.notsureifreading.presenter.ActivityResultPresenter;
-import com.frederis.notsureifreading.presenter.ActivityResultProvider;
-import com.frederis.notsureifreading.util.StartActivityForResultHandler;
-import com.frederis.notsureifreading.view.MainView;
+import com.frederis.notsureifreading.view.CoreView;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -25,27 +29,25 @@ import mortar.Mortar;
 import mortar.MortarActivityScope;
 import mortar.MortarScope;
 import mortar.MortarScopeDevHelper;
+import timber.log.Timber;
 
 import static android.content.Intent.ACTION_MAIN;
 import static android.content.Intent.CATEGORY_LAUNCHER;
 import static android.view.MenuItem.SHOW_AS_ACTION_ALWAYS;
 
-public class MainActivity extends ActionBarActivity implements ToolbarOwner.View, StartActivityForResultHandler, ActivityResultProvider {
-
-    static final String IMAGE_CAPTURE_URI = "imageCaptureUri";
-    static final String IMAGE_CAPTURE_STUDENT_ID = "imageCaptureStudentId";
+public class MainActivity extends ActionBarActivity implements ToolbarOwner.View, DrawerPresenter.View, ActivityResultPresenter.View {
 
     private MortarActivityScope activityScope;
     private ToolbarOwner.MenuAction actionBarMenuAction;
     private Toolbar mToolbar;
+    private ActionBarDrawerToggle drawerToggle;
 
     @Inject ToolbarOwner toolbarOwner;
+    @Inject DrawerPresenter drawerPresenter;
     @Inject ActivityResultPresenter activityResultPresenter;
 
+    private CoreView coreView;
     private Flow mainFlow;
-
-    private Uri mImageCaptureUri;
-    private long mImageCaptureStudentId;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,23 +58,27 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
         }
 
         MortarScope parentScope = Mortar.getScope(getApplication());
-        activityScope = Mortar.requireActivityScope(parentScope, new MainBlueprint(this));
+        activityScope = Mortar.requireActivityScope(parentScope, new CoreBlueprint());
+        activityScope.onCreate(savedInstanceState);
+
         Mortar.inject(this, this);
 
-        activityScope.onCreate(savedInstanceState);
-        if (savedInstanceState != null) {
-            mImageCaptureUri = savedInstanceState.getParcelable(IMAGE_CAPTURE_URI);
-            mImageCaptureStudentId = savedInstanceState.getLong(IMAGE_CAPTURE_STUDENT_ID);
-        }
 
         setContentView(R.layout.activity_main);
-        MainView mainView = (MainView) findViewById(R.id.container);
-        mainFlow = mainView.getFlow();
+        coreView = (CoreView) findViewById(R.id.core);
+        mainFlow = coreView.getFlow();
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
 
+        drawerToggle = coreView.getDrawerToggle();
+        ActionBarDrawerToggle.Delegate delegate = getV7DrawerToggleDelegate();
+        if (delegate != null) {
+            drawerToggle.setHomeAsUpIndicator(delegate.getThemeUpIndicator());
+        }
+
         toolbarOwner.takeView(this);
+        drawerPresenter.takeView(this);
         activityResultPresenter.takeView(this);
     }
 
@@ -86,9 +92,6 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
     @Override protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         activityScope.onSaveInstanceState(outState);
-
-        outState.putParcelable(IMAGE_CAPTURE_URI, mImageCaptureUri);
-        outState.putLong(IMAGE_CAPTURE_STUDENT_ID, mImageCaptureStudentId);
     }
 
     /** Inform the view about back events. */
@@ -99,6 +102,10 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
 
     /** Inform the view about up events. */
     @Override public boolean onOptionsItemSelected(MenuItem item) {
+        if (drawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+
         if (item.getItemId() == android.R.id.home) {
             return mainFlow.goUp();
         }
@@ -143,13 +150,19 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
         }
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
+    }
+
     @Override public Context getMortarContext() {
         return this;
     }
 
     @Override public void setShowHomeEnabled(boolean enabled) {
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayShowHomeEnabled(false);
+        actionBar.setDisplayShowHomeEnabled(enabled);
     }
 
     @Override public void setUpButtonEnabled(boolean enabled) {
@@ -190,16 +203,52 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (!activityResultPresenter.onActivityResult(requestCode, resultCode, data)) {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        drawerToggle.syncState();
     }
 
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        activityResultPresenter.onActivityResultReceived(requestCode, resultCode, data);
+    }
 
     @Override
     public MortarScope getMortarScope() {
         return activityScope;
     }
+
+    @Override
+    public void setDrawerIndicatorEnabled(boolean enabled) {
+        Log.d("NSIR", "Set drawer indicator enabled: " + enabled);
+        drawerToggle.setDrawerIndicatorEnabled(enabled);
+    }
+
+    @Override
+    public void setDrawerLockMode(int mode) {
+        coreView.setDrawerLockMode(mode);
+    }
+
+    @Override public void startActivity(Intent intent) {
+        if (canHandleIntent(intent)) {
+            startActivity(intent);
+        } else {
+            Timber.e("Could not handle intent %s... ignoring", intent);
+        }
+    }
+
+    @Override public void startActivityForResult(int requestCode, Intent intent) {
+        if (canHandleIntent(intent)) {
+            startActivityForResult(intent, requestCode);
+        } else {
+            Timber.e("Could not handle intent %s... ignoring", intent);
+        }
+    }
+
+    private boolean canHandleIntent(Intent intent) {
+        PackageManager manager = getPackageManager();
+        List<ResolveInfo> info = manager.queryIntentActivities(intent, 0);
+        return info.size() > 0;
+    }
+
 }

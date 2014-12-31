@@ -3,6 +3,8 @@ package com.frederis.notsureifreading.util;
 import android.os.Bundle;
 import android.view.View;
 
+import java.util.List;
+
 import flow.Backstack;
 import flow.Flow;
 import flow.Parcer;
@@ -12,7 +14,7 @@ import mortar.ViewPresenter;
 /**
  * Base class for all presenters that manage a {@link flow.Flow}.
  */
-public abstract class FlowOwner<S extends Blueprint, V extends View & CanShowScreen<S>>
+public abstract class FlowOwner<S extends Blueprint, V extends View & CanShowScreen<S> & CanShowDrawer<S>>
         extends ViewPresenter<V> implements Flow.Listener {
 
     private static final String FLOW_KEY = "FLOW_KEY";
@@ -42,7 +44,7 @@ public abstract class FlowOwner<S extends Blueprint, V extends View & CanShowScr
         }
 
         //noinspection unchecked
-        showScreen((S) flow.getBackstack().current().getScreen(), null);
+        showScreen((S) flow.getBackstack().current().getScreen(), null, null);
     }
 
     @Override
@@ -52,26 +54,27 @@ public abstract class FlowOwner<S extends Blueprint, V extends View & CanShowScr
     }
 
     @Override
-    public void go(Backstack backstack, Flow.Direction flowDirection, Flow.Callback callback) {
+    public void go(Backstack backstack, Flow.Direction flowDirection) {
         //noinspection unchecked
         S newScreen = (S) backstack.current().getScreen();
-        showScreen(newScreen, flowDirection);
-        callback.onComplete();
+
+        S oldScreen = null;
+        if (flowDirection == Flow.Direction.FORWARD && backstack.size() > 1) {
+            List<Backstack.Entry> entries = Lists.newArrayList(backstack.reverseIterator());
+            Backstack.Entry oldEntry = entries.get(entries.size() - 2);
+            //noinspection unchecked
+            oldScreen = (S) oldEntry.getScreen();
+        }
+
+        showScreen(newScreen, oldScreen, flowDirection);
     }
 
-    public boolean onRetreatSelected() {
-        return getFlow().goBack();
-    }
-
-    public boolean onUpSelected() {
-        return getFlow().goUp();
-    }
-
-    protected void showScreen(S newScreen, Flow.Direction flowDirection) {
+    protected void showScreen(S newScreen, S oldScreen, Flow.Direction flowDirection) {
         V view = getView();
         if (view == null) return;
 
-        view.showScreen(newScreen, flowDirection);
+        view.showScreen(newScreen, oldScreen, flowDirection);
+        view.showDrawer(getDrawerScreen());
     }
 
     public final Flow getFlow() {
@@ -82,4 +85,9 @@ public abstract class FlowOwner<S extends Blueprint, V extends View & CanShowScr
      * Returns the first screen shown by this presenter.
      */
     protected abstract S getFirstScreen();
+
+    /**
+     * Returns the screen of the navigation drawer
+     */
+    protected abstract S getDrawerScreen();
 }

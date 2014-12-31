@@ -1,53 +1,69 @@
 package com.frederis.notsureifreading.presenter;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import mortar.MortarScope;
 import mortar.Presenter;
 import mortar.Scoped;
 
-public class ActivityResultPresenter extends Presenter<ActivityResultProvider>
+@Singleton
+public class ActivityResultPresenter extends Presenter<ActivityResultPresenter.View>
         implements ActivityResultRegistrar {
 
     private final Set<Registration> registrations = new HashSet<>();
 
-    @Inject
-    public ActivityResultPresenter() {
+    public interface View {
+        MortarScope getMortarScope();
+        void startActivity(Intent intent);
+        void startActivityForResult(int requestCode, Intent intent);
+    }
+
+    public interface ActivityResultListener {
+        boolean onActivityResult(int requestCode, int resultCode, Intent data);
+    }
+
+    @Inject ActivityResultPresenter() {
     }
 
     @Override
-    protected MortarScope extractScope(ActivityResultProvider view) {
-        return view.getMortarScope();
+    protected MortarScope extractScope(View view) {
+        return getView().getMortarScope();
+    }
+
+    @Override
+    public void startActivityForResult(int requestCode, Intent intent) {
+        if (getView() == null) return;
+        getView().startActivityForResult(requestCode, intent);
+    }
+
+    @Override
+    public void onExitScope() {
+        registrations.clear();
     }
 
     @Override
     public void register(MortarScope scope, ActivityResultListener listener) {
         Registration registration = new Registration(listener);
         scope.register(registration);
-
         registrations.add(registration);
     }
 
-    @Override
-    protected void onExitScope() {
-        super.onExitScope();
-
-        registrations.clear();
+    public void startActivity(@NonNull Intent intent) {
+        if (getView() == null) return;
+        getView().startActivity(intent);
     }
 
-    public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResultReceived(int requestCode, int resultCode, Intent data) {
         for (Registration registration : registrations) {
-            if (registration.registrant.onActivityResult(requestCode, resultCode, data)) {
-                return true;
-            }
+            registration.registrant.onActivityResult(requestCode, resultCode, data);
         }
-
-        return false;
     }
 
     private class Registration implements Scoped {
@@ -57,10 +73,12 @@ public class ActivityResultPresenter extends Presenter<ActivityResultProvider>
             this.registrant = registrant;
         }
 
-        @Override public void onEnterScope(MortarScope scope) {
+        @Override
+        public void onEnterScope(MortarScope scope) {
         }
 
-        @Override public void onExitScope() {
+        @Override
+        public void onExitScope() {
             registrations.remove(this);
         }
 

@@ -1,15 +1,13 @@
 package com.frederis.notsureifreading.screen;
 
 import android.os.Bundle;
-import android.os.Handler;
 
-import com.frederis.notsureifreading.MainBlueprint;
+import com.frederis.notsureifreading.CoreBlueprint;
 import com.frederis.notsureifreading.MainScope;
 import com.frederis.notsureifreading.R;
 import com.frederis.notsureifreading.actionbar.ToolbarOwner;
 import com.frederis.notsureifreading.model.Assessment;
 import com.frederis.notsureifreading.model.Assessments;
-import com.frederis.notsureifreading.util.TitledBlueprint;
 import com.frederis.notsureifreading.view.AssessmentView;
 
 import java.util.concurrent.TimeUnit;
@@ -21,6 +19,7 @@ import dagger.Provides;
 import flow.Flow;
 import flow.HasParent;
 import flow.Layout;
+import mortar.Blueprint;
 import mortar.ViewPresenter;
 import rx.Observable;
 import rx.Subscription;
@@ -31,7 +30,7 @@ import rx.subjects.Subject;
 import rx.subscriptions.Subscriptions;
 
 @Layout(R.layout.assessment_view)
-public class AssessmentScreen implements HasParent<RecentAssessmentListScreen>, TitledBlueprint {
+public class AssessmentScreen implements HasParent<RecentAssessmentListScreen>, Blueprint {
 
     private final long mAssessmentId;
 
@@ -51,7 +50,7 @@ public class AssessmentScreen implements HasParent<RecentAssessmentListScreen>, 
         return new RecentAssessmentListScreen();
     }
 
-    @dagger.Module(injects = AssessmentView.class, addsTo = MainBlueprint.Module.class)
+    @dagger.Module(injects = AssessmentView.class, addsTo = CoreBlueprint.Module.class)
     public class Module {
 
         @Provides
@@ -100,15 +99,7 @@ public class AssessmentScreen implements HasParent<RecentAssessmentListScreen>, 
             final AssessmentView v = getView();
             if (v == null) return;
 
-            ToolbarOwner.Config actionBarConfig = actionBar.getConfig();
-
-            actionBarConfig =
-                    actionBarConfig.withAction(new ToolbarOwner.MenuAction("End", new Action0() {
-                        @Override public void call() {
-                        }
-                    }));
-
-            actionBar.setConfig(actionBarConfig);
+            actionBar.setConfig(new ToolbarOwner.Config(true, true, "Assessment", null, R.dimen.toolbar_elevation));
 
             createAssessmentIdObservable().subscribe(assessmentId);
 
@@ -129,11 +120,6 @@ public class AssessmentScreen implements HasParent<RecentAssessmentListScreen>, 
         private void ensureStopped() {
             running.unsubscribe();
         }
-    }
-
-    @Override
-    public CharSequence getTitle() {
-        return "Assessment";
     }
 
 }

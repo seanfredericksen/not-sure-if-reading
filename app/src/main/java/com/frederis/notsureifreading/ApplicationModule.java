@@ -3,9 +3,12 @@ package com.frederis.notsureifreading;
 import android.app.Application;
 import android.content.Context;
 
+import com.frederis.notsureifreading.database.DataModule;
 import com.frederis.notsureifreading.database.cursor.AssessmentCursor;
 import com.frederis.notsureifreading.database.cursor.StudentCursor;
 import com.frederis.notsureifreading.database.cursor.WordCursor;
+import com.frederis.notsureifreading.util.ScreenParcer;
+import com.frederis.notsureifreading.view.UiModule;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -15,7 +18,7 @@ import dagger.Module;
 import dagger.Provides;
 import flow.Parcer;
 
-@Module(injects = {StudentCursor.class, WordCursor.class, AssessmentCursor.class}, library = true)
+@Module(includes = {UiModule.class, DataModule.class, AndroidModule.class}, injects = {NsirApplication.class}, library = true)
 public class ApplicationModule {
 
     private Application mApplication;
@@ -31,11 +34,10 @@ public class ApplicationModule {
 
     @Provides @Singleton
     Parcer<Object> provideParcer(Gson gson) {
-        return new GsonParcer<Object>(gson);
+        return new ScreenParcer<>();
     }
 
-    @Provides @Singleton @ForApplication
-    public Context provideApplicationContext() {
+    @Provides @Singleton Application provideApplication() {
         return mApplication;
     }
 

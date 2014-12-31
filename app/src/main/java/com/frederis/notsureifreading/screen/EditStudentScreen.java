@@ -5,18 +5,19 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
+import android.support.v4.widget.DrawerLayout;
 
-import com.frederis.notsureifreading.MainBlueprint;
+import com.frederis.notsureifreading.CoreBlueprint;
 import com.frederis.notsureifreading.MainScope;
 import com.frederis.notsureifreading.R;
+import com.frederis.notsureifreading.TransitionScreen;
+import com.frederis.notsureifreading.actionbar.DrawerPresenter;
 import com.frederis.notsureifreading.actionbar.ToolbarOwner;
+import com.frederis.notsureifreading.animation.Transition;
 import com.frederis.notsureifreading.model.Student;
 import com.frederis.notsureifreading.model.Students;
-import com.frederis.notsureifreading.presenter.ActivityResultListener;
+import com.frederis.notsureifreading.presenter.ActivityResultPresenter;
 import com.frederis.notsureifreading.presenter.ActivityResultRegistrar;
-import com.frederis.notsureifreading.util.StartActivityForResultHandler;
-import com.frederis.notsureifreading.util.TitledBlueprint;
 import com.frederis.notsureifreading.view.EditStudentView;
 
 import java.io.File;
@@ -30,6 +31,7 @@ import dagger.Provides;
 import flow.Flow;
 import flow.HasParent;
 import flow.Layout;
+import mortar.Blueprint;
 import mortar.MortarScope;
 import mortar.ViewPresenter;
 import rx.Observable;
@@ -39,7 +41,8 @@ import rx.subjects.BehaviorSubject;
 import rx.subjects.Subject;
 
 @Layout(R.layout.edit_student_view)
-public class EditStudentScreen implements HasParent<StudentsListScreen>, TitledBlueprint {
+@Transition({R.animator.slide_in_right, R.animator.slide_out_left, R.animator.slide_in_left, R.animator.slide_out_right})
+public class EditStudentScreen extends TransitionScreen implements HasParent<StudentsListScreen>, Blueprint {
 
     private final long mStudentId;
 
@@ -62,7 +65,7 @@ public class EditStudentScreen implements HasParent<StudentsListScreen>, TitledB
         return new StudentsListScreen();
     }
 
-    @dagger.Module(injects = EditStudentView.class, addsTo = MainBlueprint.Module.class)
+    @dagger.Module(injects = EditStudentView.class, addsTo = CoreBlueprint.Module.class)
     public class Module {
 
         @Provides
@@ -74,16 +77,16 @@ public class EditStudentScreen implements HasParent<StudentsListScreen>, TitledB
         Presenter providePresenter(Students students,
                                    Observable<Student> student,
                                    @MainScope Flow flow,
+                                   DrawerPresenter drawerPresenter,
                                    ToolbarOwner actionBar,
-                                   StartActivityForResultHandler imageHandler,
                                    ActivityResultRegistrar activityResultRegistrar) {
-            return new Presenter(mStudentId, students, student, flow, actionBar, imageHandler, activityResultRegistrar);
+            return new Presenter(mStudentId, students, student, flow, drawerPresenter, actionBar, activityResultRegistrar);
         }
 
     }
 
     @Singleton
-    public static class Presenter extends ViewPresenter<EditStudentView> implements ActivityResultListener {
+    public static class Presenter extends ViewPresenter<EditStudentView> implements ActivityResultPresenter.ActivityResultListener {
 
         private static final int REQUEST_CAPTURE_STUDENT_IMAGE = 1123;
         private static final String KEY_IMAGE_CAPTURE_URI = "imageCaptureUri";
@@ -92,8 +95,8 @@ public class EditStudentScreen implements HasParent<StudentsListScreen>, TitledB
         private final Students students;
         private final Observable<Student> student;
         private final Flow flow;
+        private final DrawerPresenter drawerPresenter;
         private final ToolbarOwner actionBar;
-        private final StartActivityForResultHandler activityStarter;
         private final ActivityResultRegistrar activityResultRegistrar;
 
         private Uri mImageCaptureUri;
@@ -107,15 +110,15 @@ public class EditStudentScreen implements HasParent<StudentsListScreen>, TitledB
                          Students students,
                          Observable<Student> student,
                          Flow flow,
+                         DrawerPresenter drawerPresenter,
                          ToolbarOwner actionBar,
-                         StartActivityForResultHandler activityStarter,
                          ActivityResultRegistrar activityResultRegistrar) {
             this.studentId = studentId;
             this.students = students;
             this.student = student;
             this.flow = flow;
+            this.drawerPresenter = drawerPresenter;
             this.actionBar = actionBar;
-            this.activityStarter = activityStarter;
             this.activityResultRegistrar = activityResultRegistrar;
         }
 
@@ -182,7 +185,7 @@ public class EditStudentScreen implements HasParent<StudentsListScreen>, TitledB
             Intent intent = getTakePictureIntent();
 
             if (intent != null) {
-                activityStarter.startActivityForResult(getTakePictureIntent(), REQUEST_CAPTURE_STUDENT_IMAGE);
+                activityResultRegistrar.startActivityForResult(REQUEST_CAPTURE_STUDENT_IMAGE, getTakePictureIntent());
             } else {
                 //Display error finding camera message
             }
@@ -252,18 +255,15 @@ public class EditStudentScreen implements HasParent<StudentsListScreen>, TitledB
                 mImageCaptureUri = savedInstanceState.getParcelable(KEY_IMAGE_CAPTURE_URI);
             }
 
-            ToolbarOwner.Config actionBarConfig = actionBar.getConfig();
 
-            actionBarConfig = actionBarConfig
-                    .withAction(new ToolbarOwner.MenuAction("ASSESS", new Action0() {
-                        @Override
-                        public void call() {
-                            assessStudent();
-                        }
-                    }))
-                    .withElevationDimension(R.dimen.no_elevation);
+            actionBar.setConfig(new ToolbarOwner.Config(true, true, "", new ToolbarOwner.MenuAction("ASSESS", new Action0() {
+                @Override
+                public void call() {
+                    assessStudent();
+                }
+            }), R.dimen.no_elevation));
 
-            actionBar.setConfig(actionBarConfig);
+            drawerPresenter.setConfig(new DrawerPresenter.Config(false, DrawerLayout.LOCK_MODE_UNLOCKED));
 
             createNameObservable().subscribe(name);
             createStartingWordObservable().subscribe(startingWord);
@@ -299,11 +299,8 @@ public class EditStudentScreen implements HasParent<StudentsListScreen>, TitledB
 
             return false;
         }
-    }
 
-    @Override
-    public CharSequence getTitle() {
-        return "";
+
     }
 
 }

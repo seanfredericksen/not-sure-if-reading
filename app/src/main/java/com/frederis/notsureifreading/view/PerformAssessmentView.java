@@ -24,7 +24,7 @@ import javax.inject.Inject;
 import mortar.Mortar;
 import rx.Observable;
 
-public class PerformAssessmentView extends ViewPager
+public class PerformAssessmentView extends FractionalViewPager
     implements SubscriptionUtil.PagerDataHandler<ArrayList<Word>> {
 
     @Inject PerformAssessmentScreen.Presenter mPresenter;

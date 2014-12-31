@@ -84,15 +84,10 @@ public class ToolbarOwner extends Presenter<ToolbarOwner.View> {
 
     public interface View {
         void setShowHomeEnabled(boolean enabled);
-
         void setUpButtonEnabled(boolean enabled);
-
         void setTitle(CharSequence title);
-
         void setMenu(MenuAction action);
-
         void setElevationDimension(int elevationDimensionResId);
-
         Context getMortarContext();
     }
 

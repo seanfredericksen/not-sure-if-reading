@@ -20,7 +20,7 @@ import mortar.Mortar;
 import rx.Observable;
 import rx.subscriptions.CompositeSubscription;
 
-public class EditStudentView extends LinearLayout {
+public class EditStudentView extends FractionalLinearLayout {
 
     @Inject EditStudentScreen.Presenter mPresenter;
 
@@ -30,7 +30,6 @@ public class EditStudentView extends LinearLayout {
     private final EditText mEndingWord;
     private final Button mCancel;
     private final Button mSave;
-//    private final Button mAssess;
 
     private final CompositeSubscription mCompositeSubscription;
 
@@ -47,14 +46,6 @@ public class EditStudentView extends LinearLayout {
         mEndingWord = (EditText) findViewById(R.id.ending_word);
         mCancel = (Button) findViewById(R.id.cancel_button);
         mSave = (Button) findViewById(R.id.save_button);
-//        mAssess = (Button) findViewById(R.id.assess_button);
-//
-//        mAssess.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                mPresenter.assessStudent();
-//            }
-//        });
 
         mStudentImage.setOnClickListener(new OnClickListener() {
             @Override

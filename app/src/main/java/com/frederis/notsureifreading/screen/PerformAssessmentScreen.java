@@ -1,17 +1,17 @@
 package com.frederis.notsureifreading.screen;
 
 import android.os.Bundle;
-import android.util.Log;
 
-import com.frederis.notsureifreading.MainBlueprint;
+import com.frederis.notsureifreading.CoreBlueprint;
 import com.frederis.notsureifreading.MainScope;
 import com.frederis.notsureifreading.R;
+import com.frederis.notsureifreading.TransitionScreen;
 import com.frederis.notsureifreading.actionbar.ToolbarOwner;
+import com.frederis.notsureifreading.animation.Transition;
 import com.frederis.notsureifreading.model.Assessment;
 import com.frederis.notsureifreading.model.Assessments;
 import com.frederis.notsureifreading.model.Word;
 import com.frederis.notsureifreading.model.Words;
-import com.frederis.notsureifreading.util.TitledBlueprint;
 import com.frederis.notsureifreading.view.PerformAssessmentView;
 
 import java.util.ArrayList;
@@ -23,12 +23,14 @@ import javax.inject.Singleton;
 import dagger.Provides;
 import flow.Flow;
 import flow.Layout;
+import mortar.Blueprint;
 import mortar.ViewPresenter;
 import rx.Observable;
 import rx.functions.Action0;
 
 @Layout(R.layout.perform_assessment_view)
-public class PerformAssessmentScreen implements TitledBlueprint {
+@Transition({R.animator.slide_in_right, R.animator.slide_out_left, R.animator.slide_in_left, R.animator.slide_out_right})
+public class PerformAssessmentScreen extends TransitionScreen implements Blueprint {
 
     private final long mStudentId;
 
@@ -46,7 +48,7 @@ public class PerformAssessmentScreen implements TitledBlueprint {
         return new Module();
     }
 
-    @dagger.Module(injects = PerformAssessmentView.class, addsTo = MainBlueprint.Module.class)
+    @dagger.Module(injects = PerformAssessmentView.class, addsTo = CoreBlueprint.Module.class)
     public class Module {
 
         @Provides
@@ -85,19 +87,13 @@ public class PerformAssessmentScreen implements TitledBlueprint {
             final PerformAssessmentView view = getView();
             if (view == null) return;
 
-            ToolbarOwner.Config actionBarConfig = mActionBar.getConfig();
-
-            actionBarConfig = actionBarConfig
-                    .withAction(new ToolbarOwner.MenuAction("SAVE", new Action0() {
-                        @Override
-                        public void call() {
-                            mAssessments.updateOrInsertAssessment(getAssessment());
-                            mFlow.goBack();
-                        }
-                    }))
-                    .withElevationDimension(R.dimen.no_elevation);
-
-            mActionBar.setConfig(actionBarConfig);
+            mActionBar.setConfig(new ToolbarOwner.Config(true, true, "Assessment", new ToolbarOwner.MenuAction("SAVE", new Action0() {
+                @Override
+                public void call() {
+                    mAssessments.updateOrInsertAssessment(getAssessment());
+                    mFlow.goBack();
+                }
+            }), R.dimen.toolbar_elevation));
 
             view.showWords(mWords);
         }
@@ -116,9 +112,4 @@ public class PerformAssessmentScreen implements TitledBlueprint {
 
     }
 
-
-    @Override
-    public CharSequence getTitle() {
-        return "Assessment";
-    }
 }

@@ -2,15 +2,13 @@ package com.frederis.notsureifreading.screen;
 
 import android.os.Bundle;
 
-import com.frederis.notsureifreading.MainBlueprint;
+import com.frederis.notsureifreading.CoreBlueprint;
 import com.frederis.notsureifreading.R;
 import com.frederis.notsureifreading.model.Assessment;
 import com.frederis.notsureifreading.model.Assessments;
-import com.frederis.notsureifreading.util.TitledBlueprint;
 import com.frederis.notsureifreading.view.RecentAssessmentListView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -23,7 +21,7 @@ import mortar.ViewPresenter;
 import rx.Observable;
 
 @Layout(R.layout.recent_assessment_list_view) //
-public class RecentAssessmentListScreen implements TitledBlueprint {
+public class RecentAssessmentListScreen implements Blueprint {
 
     @Override
     public String getMortarScopeName() {
@@ -35,7 +33,7 @@ public class RecentAssessmentListScreen implements TitledBlueprint {
         return new Module();
     }
 
-    @dagger.Module(injects = RecentAssessmentListView.class, addsTo = MainBlueprint.Module.class)
+    @dagger.Module(injects = RecentAssessmentListView.class, addsTo = CoreBlueprint.Module.class)
     static class Module {
 
         @Provides
@@ -70,11 +68,6 @@ public class RecentAssessmentListScreen implements TitledBlueprint {
             mFlow.goTo(new AssessmentScreen(position));
         }
 
-    }
-
-    @Override
-    public CharSequence getTitle() {
-        return "Recent Assessments";
     }
 
 }
