@@ -84,7 +84,15 @@ public class ScreenConductor<S extends Blueprint> implements CanShowScreen<S>, C
                         }
                         break;
                     case REPLACE:
-                        // no animations
+                        if (newScreen instanceof TransitionScreen) {
+                            // Try to load animations from a screen and set them
+                            int[] transitionIds = ((TransitionScreen) newScreen).getTransitions();
+                            if (transitionIds == null) {
+                                transitionIds = Transitions.getTransitionResources(newScreen.getClass());
+                            }
+
+                            transitions = Transitions.backward(context, transitionIds);
+                        }
                         break;
                 }
             }

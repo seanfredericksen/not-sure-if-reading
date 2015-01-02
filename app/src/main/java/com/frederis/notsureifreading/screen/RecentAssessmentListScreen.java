@@ -1,9 +1,14 @@
 package com.frederis.notsureifreading.screen;
 
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
 
 import com.frederis.notsureifreading.CoreBlueprint;
 import com.frederis.notsureifreading.R;
+import com.frederis.notsureifreading.TransitionScreen;
+import com.frederis.notsureifreading.actionbar.DrawerPresenter;
+import com.frederis.notsureifreading.actionbar.ToolbarOwner;
+import com.frederis.notsureifreading.animation.Transition;
 import com.frederis.notsureifreading.model.Assessment;
 import com.frederis.notsureifreading.model.Assessments;
 import com.frederis.notsureifreading.view.RecentAssessmentListView;
@@ -19,9 +24,11 @@ import flow.Layout;
 import mortar.Blueprint;
 import mortar.ViewPresenter;
 import rx.Observable;
+import rx.functions.Action0;
 
-@Layout(R.layout.recent_assessment_list_view) //
-public class RecentAssessmentListScreen implements Blueprint {
+@Layout(R.layout.recent_assessment_list_view)
+@Transition({R.animator.scale_fade_in, R.animator.scale_fade_out, R.animator.scale_fade_in, R.animator.scale_fade_out})
+public class RecentAssessmentListScreen extends TransitionScreen implements Blueprint {
 
     @Override
     public String getMortarScopeName() {
@@ -48,11 +55,15 @@ public class RecentAssessmentListScreen implements Blueprint {
 
         private final Flow mFlow;
         private final Observable<ArrayList<Assessment>> mAssessments;
+        private final DrawerPresenter mDrawerPresenter;
+        private final ToolbarOwner mActionBar;
 
         @Inject
-        Presenter(Flow flow, Observable<ArrayList<Assessment>> assessments) {
+        Presenter(Flow flow, Observable<ArrayList<Assessment>> assessments, DrawerPresenter drawerPresenter, ToolbarOwner actionBar) {
             mFlow = flow;
             mAssessments = assessments;
+            mDrawerPresenter = drawerPresenter;
+            mActionBar = actionBar;
         }
 
         @Override
@@ -60,6 +71,9 @@ public class RecentAssessmentListScreen implements Blueprint {
             super.onLoad(savedInstanceState);
             RecentAssessmentListView view = getView();
             if (view == null) return;
+
+            mActionBar.setConfig(new ToolbarOwner.Config(true, true, "Assessments", null, R.dimen.toolbar_elevation));
+            mDrawerPresenter.setConfig(new DrawerPresenter.Config(true, DrawerLayout.LOCK_MODE_UNLOCKED));
 
             view.showAssessments(mAssessments);
         }

@@ -11,6 +11,8 @@ public class DrawerPresenter extends Presenter<DrawerPresenter.View> {
         MortarScope getMortarScope();
         void setDrawerIndicatorEnabled(boolean enabled);
         void setDrawerLockMode(int mode);
+        void openDrawer();
+        void closeDrawer();
     }
 
     public static class Config {
@@ -28,6 +30,18 @@ public class DrawerPresenter extends Presenter<DrawerPresenter.View> {
     @Override
     protected MortarScope extractScope(View view) {
         return view.getMortarScope();
+    }
+
+    public void openDrawer() {
+        if (getView() == null) return;
+
+        getView().openDrawer();
+    }
+
+    public void closeDrawer() {
+        if (getView() == null) return;
+
+        getView().closeDrawer();
     }
 
     @Override

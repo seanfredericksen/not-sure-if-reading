@@ -26,7 +26,7 @@ import mortar.ViewPresenter;
 import rx.Observable;
 
 @Layout(R.layout.student_list_view)
-@Transition({R.animator.slide_in_right, R.animator.slide_out_left, R.animator.slide_in_left, R.animator.slide_out_right})
+@Transition({R.animator.scale_fade_in, R.animator.scale_fade_out, R.animator.scale_fade_in, R.animator.scale_fade_out})
 public class StudentsListScreen extends TransitionScreen implements Blueprint {
 
     @Override

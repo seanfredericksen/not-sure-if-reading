@@ -220,13 +220,22 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
 
     @Override
     public void setDrawerIndicatorEnabled(boolean enabled) {
-        Log.d("NSIR", "Set drawer indicator enabled: " + enabled);
         drawerToggle.setDrawerIndicatorEnabled(enabled);
     }
 
     @Override
     public void setDrawerLockMode(int mode) {
         coreView.setDrawerLockMode(mode);
+    }
+
+    @Override
+    public void openDrawer() {
+        coreView.openDrawer();
+    }
+
+    @Override
+    public void closeDrawer() {
+        coreView.closeDrawer();
     }
 
     @Override public void startActivity(Intent intent) {

@@ -4,15 +4,24 @@ import android.os.Bundle;
 
 import com.frederis.notsureifreading.CoreBlueprint;
 import com.frederis.notsureifreading.R;
+import com.frederis.notsureifreading.actionbar.DrawerPresenter;
+import com.frederis.notsureifreading.model.Assessment;
+import com.frederis.notsureifreading.model.Assessments;
+import com.frederis.notsureifreading.model.NavigationDrawer;
+import com.frederis.notsureifreading.model.NavigationDrawerItem;
 import com.frederis.notsureifreading.view.DrawerView;
+
+import java.util.ArrayList;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import dagger.Provides;
 import flow.Flow;
 import flow.Layout;
 import mortar.Blueprint;
 import mortar.ViewPresenter;
+import rx.Observable;
 
 @Layout(R.layout.drawer)
 public class DrawerScreen implements Blueprint {
@@ -34,40 +43,40 @@ public class DrawerScreen implements Blueprint {
             library = true
     )
     public static class Module {
+
+        @Provides
+        Observable<ArrayList<NavigationDrawerItem>> provideAssessments(NavigationDrawer drawer) {
+            return drawer.getItems();
+        }
+
     }
 
     @Singleton
     public static class Presenter extends ViewPresenter<DrawerView> {
 
         private final Flow flow;
+        private DrawerPresenter drawerPresenter;
+        private final Observable<ArrayList<NavigationDrawerItem>> drawerItems;
 
-        @Inject Presenter(Flow flow) {
+        @Inject Presenter(Flow flow, DrawerPresenter drawerPresenter, Observable<ArrayList<NavigationDrawerItem>> drawerItems) {
             this.flow = flow;
+            this.drawerPresenter = drawerPresenter;
+            this.drawerItems = drawerItems;
         }
 
         @Override
         public void onLoad(Bundle savedInstanceState) {
             super.onLoad(savedInstanceState);
-            if (getView() == null) return;
+            DrawerView view = getView();
+            if (view == null) return;
 
-            //getView().setListAdapter();
+            view.showDrawerItems(drawerItems);
         }
 
-        public void goToScreenAtPosition(int position) {
-//            switch (position) {
-//                case 0:
-//                    flow.replaceTo(new GalleryScreen());
-//                    break;
-//                case 1:
-//                    flow.replaceTo(new NestedScreen());
-//                    break;
-//                case 2:
-//                    flow.replaceTo(new StubXScreen(true, position - 1));
-//                    break;
-//                case 3:
-//                    flow.replaceTo(new ViewStateScreen(1));
-//                    break;
-//            }
+        public void onDrawerItemSelected(NavigationDrawerItem item) {
+            drawerPresenter.closeDrawer();
+            flow.replaceTo(item.getTransitionScreen());
         }
+
     }
 }

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:background="@drawable/student_list_selector"
+             android:orientation="horizontal"
+             android:minHeight="72dip">
+
+    <ImageView
+        android:id="@+id/item_icon"
+        android:layout_width="42dip"
+        android:layout_height="42dip"
+        android:layout_gravity="center_vertical"
+        android:scaleType="centerCrop"
+        android:layout_marginLeft="16dip"/>
+
+    <TextView
+        android:id="@+id/item_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_gravity="center_vertical"
+        android:textColor="@color/body_text_1"
+        tools:text="Sean Fredericksen"/>
+
+</LinearLayout>

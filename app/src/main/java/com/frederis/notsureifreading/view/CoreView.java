@@ -60,6 +60,14 @@ public class CoreView extends DrawerLayout implements CanShowScreen<Blueprint>, 
         presenter.dropView(this);
     }
 
+    public void openDrawer() {
+        openDrawer(navigationContainer);
+    }
+
+    public void closeDrawer() {
+        closeDrawer(navigationContainer);
+    }
+
     public Flow getFlow() {
         return presenter.getFlow();
     }
