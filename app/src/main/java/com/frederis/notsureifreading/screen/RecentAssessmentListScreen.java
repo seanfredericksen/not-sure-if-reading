@@ -2,6 +2,7 @@ package com.frederis.notsureifreading.screen;
 
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 
 import com.frederis.notsureifreading.CoreBlueprint;
 import com.frederis.notsureifreading.R;
@@ -11,6 +12,7 @@ import com.frederis.notsureifreading.actionbar.ToolbarOwner;
 import com.frederis.notsureifreading.animation.Transition;
 import com.frederis.notsureifreading.model.Assessment;
 import com.frederis.notsureifreading.model.Assessments;
+import com.frederis.notsureifreading.model.Students;
 import com.frederis.notsureifreading.view.RecentAssessmentListView;
 
 import java.util.ArrayList;
@@ -25,6 +27,9 @@ import mortar.Blueprint;
 import mortar.ViewPresenter;
 import rx.Observable;
 import rx.functions.Action0;
+import rx.functions.Func1;
+
+import static com.frederis.notsureifreading.view.RecentAssessmentListView.RecentAssessment;
 
 @Layout(R.layout.recent_assessment_list_view)
 @Transition({R.animator.scale_fade_in, R.animator.scale_fade_out, R.animator.scale_fade_in, R.animator.scale_fade_out})
@@ -48,18 +53,23 @@ public class RecentAssessmentListScreen extends TransitionScreen implements Blue
             return assessments.getAll();
         }
 
+        @Provides
+        Observable<ArrayList<RecentAssessment>> provideRecentAssessments(final Students students, Observable<ArrayList<Assessment>> allAssessments) {
+            return allAssessments.map(new RecentAssessmentCreator(students));
+        }
+
     }
 
     @Singleton
     public static class Presenter extends ViewPresenter<RecentAssessmentListView> {
 
         private final Flow mFlow;
-        private final Observable<ArrayList<Assessment>> mAssessments;
+        private final Observable<ArrayList<RecentAssessment>> mAssessments;
         private final DrawerPresenter mDrawerPresenter;
         private final ToolbarOwner mActionBar;
 
         @Inject
-        Presenter(Flow flow, Observable<ArrayList<Assessment>> assessments, DrawerPresenter drawerPresenter, ToolbarOwner actionBar) {
+        Presenter(Flow flow, Observable<ArrayList<RecentAssessment>> assessments, DrawerPresenter drawerPresenter, ToolbarOwner actionBar) {
             mFlow = flow;
             mAssessments = assessments;
             mDrawerPresenter = drawerPresenter;
@@ -82,6 +92,47 @@ public class RecentAssessmentListScreen extends TransitionScreen implements Blue
             mFlow.goTo(new AssessmentScreen(position));
         }
 
+    }
+
+    private static class RecentAssessmentCreator implements Func1<ArrayList<Assessment>, ArrayList<RecentAssessment>> {
+
+        private Students students;
+
+        public RecentAssessmentCreator(Students students) {
+            this.students = students;
+        }
+
+        @Override
+        public ArrayList<RecentAssessment> call(ArrayList<Assessment> assessments) {
+            ArrayList<RecentAssessment> recentAssessments = new ArrayList<>();
+
+            for (Assessment assessment : assessments) {
+                recentAssessments.add(new RecentAssessment(assessment,
+                        students.readStudent(assessment.getStudentId()).getName(),
+                        calculateAccuracy(assessment)));
+            }
+
+            return recentAssessments;
+        }
+
+        private int calculateAccuracy(Assessment assessment) {
+            float total = (float) (assessment.getEndingWord() - assessment.getStartingWord() + 1);
+            float correct = 0.0f;
+
+            for (int i = 0; i < total; i++) {
+                long result =
+                        (i < 50
+                                ? assessment.getOneToFiftyResult()
+                                : assessment.getFiftyOneToOneHundredResult()
+                        ) & (1L << (i < 50 ? (49 - i) : (99 - i)));
+
+                if (result != 0L) {
+                    correct++;
+                }
+            }
+
+            return Math.round((correct / total) * 100f);
+        }
     }
 
 }

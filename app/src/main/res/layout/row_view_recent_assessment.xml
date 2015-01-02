@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="@drawable/student_list_selector"
+              android:padding="16dp"
+              android:orientation="vertical"
+              android:minHeight="72dip">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/assessment_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignBaseline="@+id/student_name"
+            android:layout_marginLeft="10dip"
+            android:textSize="12sp"
+            android:textColor="@color/body_text_2"
+            tools:text="11/3/2014"/>
+
+        <TextView
+            android:id="@+id/assessment_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:layout_alignParentLeft="true"
+            android:singleLine="true"
+            android:layout_toLeftOf="@id/assessment_date"
+            android:textColor="@color/body_text_1"
+            tools:text="Sean Fredericksen"/>
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/assessment_details"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="@color/body_text_2"
+        tools:text="78% accuracy on words 1 to 20"/>
+
+</LinearLayout>

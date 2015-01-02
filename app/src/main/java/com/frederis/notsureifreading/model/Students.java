@@ -193,7 +193,7 @@ public class Students {
         return students;
     }
 
-    private Student readStudent(long studentId) {
+    public Student readStudent(long studentId) {
         StudentCursor cursor = new StudentCursor(mContext,
                 mDatabase.getReadableDatabase().query(mStudentTable.getTableName(),
                         new String[]{mStudentTable.getIdColumnName(),

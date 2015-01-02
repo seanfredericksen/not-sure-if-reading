@@ -15,6 +15,7 @@
     <string name="ending_word_hint">Ending word number</string>
 
     <string name="words_description">Words: %1$d - %2$d</string>
+    <string name="assessment_description">%1$s accuracy on words %2$d to %3$d</string>
     <string name="students">Students</string>
     <string name="assessments">Assessments</string>
     <string name="log">Log</string>

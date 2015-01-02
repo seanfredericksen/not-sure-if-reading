@@ -85,8 +85,22 @@ public class RecentAssessmentListView extends FrameLayout {
         presenter.dropView(this);
     }
 
-    public void showAssessments(Observable<ArrayList<Assessment>> assessments) {
+    public void showAssessments(Observable<ArrayList<RecentAssessment>> assessments) {
         mRecycler.showAssessments(assessments);
+    }
+
+    public static class RecentAssessment {
+
+        public Assessment assessment;
+        public String studentName;
+        public int percentAccuracy;
+
+        public RecentAssessment(Assessment assessment, String studentName, int percentAccuracy) {
+            this.assessment = assessment;
+            this.studentName = studentName;
+            this.percentAccuracy = percentAccuracy;
+        }
+
     }
 
 }

@@ -106,7 +106,7 @@ public class Assessments {
                         null,
                         null,
                         null,
-                        null));
+                        mAssessmentTable.getDateColumn() + " DESC"));
 
         ArrayList<Assessment> assessments = new ArrayList<>();
 

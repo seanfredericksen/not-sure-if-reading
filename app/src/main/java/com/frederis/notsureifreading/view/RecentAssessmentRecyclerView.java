@@ -15,12 +15,18 @@ import com.frederis.notsureifreading.model.Assessment;
 import com.frederis.notsureifreading.util.SubscriptionUtil;
 import com.frederis.notsureifreading.widget.BezelImageView;
 
+import org.joda.time.format.ISODateTimeFormat;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.TimeZone;
 
 import rx.Observable;
 
+import static com.frederis.notsureifreading.view.RecentAssessmentListView.RecentAssessment;
+
 public class RecentAssessmentRecyclerView extends RecyclerView
-        implements SubscriptionUtil.ListDataHandler<ArrayList<Assessment>> {
+        implements SubscriptionUtil.ListDataHandler<ArrayList<RecentAssessment>> {
 
     private OnAssessmentSelectedListener mListener;
 
@@ -32,7 +38,7 @@ public class RecentAssessmentRecyclerView extends RecyclerView
         addItemDecoration(new DividerItemDecoration(context, null, true, true));
     }
 
-    public void showAssessments(Observable<ArrayList<Assessment>> assessments) {
+    public void showAssessments(Observable<ArrayList<RecentAssessment>> assessments) {
         SubscriptionUtil.subscribeListView(assessments, this);
     }
 
@@ -41,7 +47,7 @@ public class RecentAssessmentRecyclerView extends RecyclerView
     }
 
     @Override
-    public void setData(ArrayList<Assessment> data) {
+    public void setData(ArrayList<RecentAssessment> data) {
         setAdapter(new Adapter(getContext(), data, new OnAssessmentSelectedListener() {
             @Override
             public void onAssessmentSelected(long id) {
@@ -55,30 +61,39 @@ public class RecentAssessmentRecyclerView extends RecyclerView
     private static class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
         private Context mContext;
-        private ArrayList<Assessment> mAssessments;
+        private ArrayList<RecentAssessment> mAssessments;
         private OnAssessmentSelectedListener mListener;
+        private SimpleDateFormat mDateFormat;
 
-        public Adapter(Context context, ArrayList<Assessment> assessments, OnAssessmentSelectedListener listener) {
+        public Adapter(Context context, ArrayList<RecentAssessment> assessments, OnAssessmentSelectedListener listener) {
             mContext = context;
             mAssessments = assessments;
             mListener = listener;
+            mDateFormat = new SimpleDateFormat("cccc, MMM d");
+            mDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
         }
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             return new ViewHolder(LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.row_view_student_list, parent, false));
+                    .inflate(R.layout.row_view_recent_assessment, parent, false));
         }
 
         @Override
         public void onBindViewHolder(ViewHolder viewHolder, int position) {
-            final Assessment assessment = mAssessments.get(position);
+            final RecentAssessment assessment = mAssessments.get(position);
 
-            viewHolder.studentName.setText("Assessment for student: " + assessment.getStudentId());
+            viewHolder.assessmentName.setText(assessment.studentName);
+            viewHolder.assessmentDescription.setText(mContext.getString(R.string.assessment_description,
+                    assessment.percentAccuracy + "%",
+                    assessment.assessment.getStartingWord(),
+                    assessment.assessment.getEndingWord()));
+            viewHolder.assessmentDate.setText(mDateFormat.format(assessment.assessment.getDate()));
             viewHolder.row.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mListener.onAssessmentSelected(assessment.getId());
+                    mListener.onAssessmentSelected(assessment.assessment.getId());
                 }
             });
 
@@ -86,7 +101,7 @@ public class RecentAssessmentRecyclerView extends RecyclerView
 
         @Override
         public long getItemId(int position) {
-            return mAssessments.get(position).getId();
+            return mAssessments.get(position).assessment.getId();
         }
 
         @Override
@@ -97,17 +112,17 @@ public class RecentAssessmentRecyclerView extends RecyclerView
         public static class ViewHolder extends RecyclerView.ViewHolder {
 
             public View row;
-            public TextView studentName;
-            public TextView wordsDescription;
-            public BezelImageView studentImage;
+            public TextView assessmentName;
+            public TextView assessmentDescription;
+            public TextView assessmentDate;
 
             public ViewHolder(View view) {
                 super(view);
 
                 row = view;
-                studentName = (TextView) view.findViewById(R.id.student_name);
-                wordsDescription = (TextView) view.findViewById(R.id.sight_words_desc);
-                studentImage = (BezelImageView) view.findViewById(R.id.student_image);
+                assessmentName = (TextView) view.findViewById(R.id.assessment_name);
+                assessmentDescription = (TextView) view.findViewById(R.id.assessment_details);
+                assessmentDate = (TextView) view.findViewById(R.id.assessment_date);
             }
         }
 
