@@ -1,6 +1,7 @@
 package com.frederis.notsureifreading.screen;
 
 import android.os.Bundle;
+import android.view.MenuItem;
 
 import com.frederis.notsureifreading.CoreBlueprint;
 import com.frederis.notsureifreading.MainScope;
@@ -99,7 +100,12 @@ public class AssessmentScreen implements HasParent<RecentAssessmentListScreen>, 
             final AssessmentView v = getView();
             if (v == null) return;
 
-            actionBar.setConfig(new ToolbarOwner.Config(true, true, "Assessment", null, R.dimen.toolbar_elevation));
+            actionBar.setConfig(new ToolbarOwner.Config.Builder()
+                    .withShowHomeEnabled(true)
+                    .withUpEnabled(true)
+                    .withTitleResId(R.string.assessment)
+                    .withElevationDimensionResId(R.dimen.toolbar_elevation)
+                    .build());
 
             createAssessmentIdObservable().subscribe(assessmentId);
 

@@ -1,6 +1,8 @@
 package com.frederis.notsureifreading.screen;
 
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.frederis.notsureifreading.CoreBlueprint;
 import com.frederis.notsureifreading.MainScope;
@@ -87,13 +89,28 @@ public class PerformAssessmentScreen extends TransitionScreen implements Bluepri
             final PerformAssessmentView view = getView();
             if (view == null) return;
 
-            mActionBar.setConfig(new ToolbarOwner.Config(true, true, "Assessment", new ToolbarOwner.MenuAction("SAVE", new Action0() {
-                @Override
-                public void call() {
-                    mAssessments.updateOrInsertAssessment(getAssessment());
-                    mFlow.goBack();
-                }
-            }), R.dimen.toolbar_elevation));
+            mActionBar.setConfig(new ToolbarOwner.Config.Builder()
+                    .withShowHomeEnabled(true)
+                    .withUpEnabled(true)
+                    .withTitleResId(R.string.assessment)
+                    .withElevationDimensionResId(R.dimen.no_elevation)
+                    .withActions(new ToolbarOwner.MenuActions(R.menu.perform_assessment, new ToolbarOwner.MenuActions.Callback() {
+                        @Override
+                        public void onConfigureOptionsMenu(Menu menu) {
+                        }
+
+                        @Override
+                        public boolean onMenuItemSelected(MenuItem menuItem) {
+                            if (menuItem.getItemId() == R.id.save_assessment) {
+                                mAssessments.updateOrInsertAssessment(getAssessment());
+                                mFlow.goBack();
+                                return true;
+                            }
+
+                            return false;
+                        }
+                    }))
+                    .build());
 
             view.showWords(mWords);
         }

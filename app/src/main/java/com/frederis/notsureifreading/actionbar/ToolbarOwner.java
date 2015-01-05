@@ -2,46 +2,83 @@ package com.frederis.notsureifreading.actionbar;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+
 import mortar.Mortar;
 import mortar.MortarScope;
 import mortar.Presenter;
-import rx.functions.Action0;
 
 public class ToolbarOwner extends Presenter<ToolbarOwner.View> {
 
     public static class Config {
         public final boolean showHomeEnabled;
         public final boolean upButtonEnabled;
-        public final CharSequence title;
-        public final MenuAction action;
+        public final int titleResId;
+        public final MenuActions actions;
         public final int elevationDimensionResId;
 
-        public Config(boolean showHomeEnabled, boolean upButtonEnabled, CharSequence title,
-                      MenuAction action, int elevationDimensionResId) {
+        public Config(boolean showHomeEnabled, boolean upButtonEnabled, int titleResId,
+                      MenuActions actions, int elevationDimensionResId) {
             this.showHomeEnabled = showHomeEnabled;
             this.upButtonEnabled = upButtonEnabled;
-            this.title = title;
-            this.action = action;
+            this.titleResId = titleResId;
+            this.actions = actions;
             this.elevationDimensionResId = elevationDimensionResId;
         }
 
-        public Config withAction(MenuAction action) {
-            return new Config(showHomeEnabled, upButtonEnabled, title, action, elevationDimensionResId);
-        }
+        public static class Builder {
 
-        public Config withElevationDimension(int elevationDimensionResId) {
-            return new Config(showHomeEnabled, upButtonEnabled, title, action, elevationDimensionResId);
+            public boolean showHomeEnabled;
+            public boolean upButtonEnabled;
+            public int titleResId;
+            public MenuActions actions;
+            public int elevationDimensionResId;
+
+            public Builder withShowHomeEnabled(boolean enabled) {
+                showHomeEnabled = enabled;
+                return this;
+            }
+
+            public Builder withUpEnabled(boolean enabled) {
+                upButtonEnabled = enabled;
+                return this;
+            }
+
+            public Builder withTitleResId(int titleResId) {
+                this.titleResId = titleResId;
+                return this;
+            }
+
+            public Builder withActions(MenuActions actions) {
+                this.actions = actions;
+                return this;
+            }
+
+            public Builder withElevationDimensionResId(int elevationDimensionResId) {
+                this.elevationDimensionResId = elevationDimensionResId;
+                return this;
+            }
+
+            public Config build() {
+                return new Config(showHomeEnabled, upButtonEnabled, titleResId, actions, elevationDimensionResId);
+            }
         }
 
     }
 
-    public static class MenuAction {
-        public final CharSequence title;
-        public final Action0 action;
+    public static class MenuActions {
+        public final int menuResource;
+        public final Callback callback;
 
-        public MenuAction(CharSequence title, Action0 action) {
-            this.title = title;
-            this.action = action;
+        public MenuActions(int menuResource, Callback callback) {
+            this.menuResource = menuResource;
+            this.callback = callback;
+        }
+
+        public static interface Callback {
+            void onConfigureOptionsMenu(Menu menu);
+            boolean onMenuItemSelected(MenuItem menuItem);
         }
     }
 
@@ -77,16 +114,16 @@ public class ToolbarOwner extends Presenter<ToolbarOwner.View> {
 
         view.setShowHomeEnabled(config.showHomeEnabled);
         view.setUpButtonEnabled(config.upButtonEnabled);
-        view.setTitle(config.title);
-        view.setMenu(config.action);
+        view.setTitleResId(config.titleResId);
+        view.setMenu(config.actions);
         view.setElevationDimension(config.elevationDimensionResId);
     }
 
     public interface View {
         void setShowHomeEnabled(boolean enabled);
         void setUpButtonEnabled(boolean enabled);
-        void setTitle(CharSequence title);
-        void setMenu(MenuAction action);
+        void setTitleResId(int titleResId);
+        void setMenu(MenuActions action);
         void setElevationDimension(int elevationDimensionResId);
         Context getMortarContext();
     }

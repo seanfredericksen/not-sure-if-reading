@@ -1,8 +1,13 @@
 package com.frederis.notsureifreading.screen;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.frederis.notsureifreading.CoreBlueprint;
 import com.frederis.notsureifreading.R;
@@ -26,6 +31,8 @@ import flow.Layout;
 import mortar.Blueprint;
 import mortar.ViewPresenter;
 import rx.Observable;
+import rx.Observer;
+import rx.Subscriber;
 import rx.functions.Action0;
 import rx.functions.Func1;
 
@@ -79,10 +86,67 @@ public class RecentAssessmentListScreen extends TransitionScreen implements Blue
         @Override
         public void onLoad(Bundle savedInstanceState) {
             super.onLoad(savedInstanceState);
-            RecentAssessmentListView view = getView();
+            final RecentAssessmentListView view = getView();
+
             if (view == null) return;
 
-            mActionBar.setConfig(new ToolbarOwner.Config(true, true, "Assessments", null, R.dimen.toolbar_elevation));
+            mActionBar.setConfig(new ToolbarOwner.Config.Builder()
+                    .withShowHomeEnabled(true)
+                    .withUpEnabled(true)
+                    .withTitleResId(R.string.assessments)
+                    .withElevationDimensionResId(R.dimen.toolbar_elevation)
+                    .withActions(new ToolbarOwner.MenuActions(R.menu.recent_assessment_list, new ToolbarOwner.MenuActions.Callback() {
+
+                        @Override
+                        public void onConfigureOptionsMenu(Menu menu) {
+                            SearchView searchView = (SearchView) menu.findItem(R.id.search_assessments).getActionView();
+                            searchView.setIconifiedByDefault(false);
+                            searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+                                @Override
+                                public boolean onClose() {
+                                    view.showAssessments(mAssessments);
+                                    return true;
+                                }
+                            });
+                            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                                @Override
+                                public boolean onQueryTextSubmit(String s) {
+                                    return false;
+                                }
+
+                                @Override
+                                public boolean onQueryTextChange(final String s) {
+                                    if (s.length() >= 3) {
+                                        view.showAssessments(mAssessments.map(new Func1<ArrayList<RecentAssessment>, ArrayList<RecentAssessment>>() {
+                                            @Override
+                                            public ArrayList<RecentAssessment> call(ArrayList<RecentAssessment> recentAssessments) {
+                                                ArrayList<RecentAssessment> filtered = new ArrayList<>();
+
+                                                for (RecentAssessment assessment : recentAssessments) {
+                                                    if (assessment.studentName.toLowerCase().contains(s.toLowerCase())) {
+                                                        filtered.add(assessment);
+                                                    }
+                                                }
+
+                                                return filtered;
+                                            }
+                                        }));
+                                    } else {
+                                        view.showAssessments(mAssessments);
+                                    }
+
+                                    return true;
+                                }
+                            });
+                        }
+
+                        @Override
+                        public boolean onMenuItemSelected(MenuItem menuItem) {
+                            return false;
+                        }
+                    }))
+                    .build());
+
             mDrawerPresenter.setConfig(new DrawerPresenter.Config(true, DrawerLayout.LOCK_MODE_UNLOCKED));
 
             view.showAssessments(mAssessments);

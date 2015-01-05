@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.widget.DrawerLayout;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.frederis.notsureifreading.CoreBlueprint;
 import com.frederis.notsureifreading.MainScope;
@@ -256,12 +258,28 @@ public class EditStudentScreen extends TransitionScreen implements HasParent<Stu
             }
 
 
-            actionBar.setConfig(new ToolbarOwner.Config(true, true, "", new ToolbarOwner.MenuAction("ASSESS", new Action0() {
-                @Override
-                public void call() {
-                    assessStudent();
-                }
-            }), R.dimen.no_elevation));
+            actionBar.setConfig(new ToolbarOwner.Config.Builder()
+                    .withShowHomeEnabled(true)
+                    .withUpEnabled(true)
+                    .withTitleResId(R.string.empty)
+                    .withElevationDimensionResId(R.dimen.no_elevation)
+                    .withActions(new ToolbarOwner.MenuActions(R.menu.edit_student, new ToolbarOwner.MenuActions.Callback() {
+                        @Override
+                        public void onConfigureOptionsMenu(Menu menu) {
+                        }
+
+                        @Override
+                        public boolean onMenuItemSelected(MenuItem menuItem) {
+                            if (menuItem.getItemId() == R.id.launch_assessment) {
+                                assessStudent();
+                                return true;
+                            }
+
+                            return false;
+                        }
+                    }))
+                    .build());
+
 
             drawerPresenter.setConfig(new DrawerPresenter.Config(false, DrawerLayout.LOCK_MODE_UNLOCKED));
 

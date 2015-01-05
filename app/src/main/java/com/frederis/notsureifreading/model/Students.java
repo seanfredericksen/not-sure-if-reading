@@ -16,7 +16,9 @@ import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
@@ -71,7 +73,7 @@ public class Students {
     }
 
     public Observable<ArrayList<Student>> getAll() {
-        BehaviorSubject<ArrayList<Student>> students = BehaviorSubject.create(new ArrayList<Student>());
+        BehaviorSubject<ArrayList<Student>> students = BehaviorSubject.create();
 
         getStudentList().subscribe(students);
         mStudentsUpdated.flatMap(new Func1<Object, Observable<ArrayList<Student>>>() {
@@ -81,7 +83,7 @@ public class Students {
             }
         }).subscribe(students);
 
-        return students;
+        return students.asObservable();
     }
 
     public Observable<Student> getStudent(final long studentId) {
@@ -98,18 +100,12 @@ public class Students {
     }
 
     private Observable<ArrayList<Student>> getStudentList() {
-//        BehaviorSubject<ArrayList<Student>> students = BehaviorSubject.create();
-//
-//        Observable.just(new Object()).map(new StudentListBuilder()).subscribe(students);
-//
-//        return students;
-
         return Observable.create(new Observable.OnSubscribe<ArrayList<Student>>() {
             @Override
             public void call(Subscriber<? super ArrayList<Student>> subscriber) {
                 subscriber.onNext(getStudents());
             }
-        });
+        }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io());
     }
 
     private class StudentQuery implements Func1<Long, StudentCursor> {
@@ -152,7 +148,6 @@ public class Students {
             ArrayList<Student> students = new ArrayList<Student>();
 
             if (cursor.moveToFirst()) {
-                Log.d("NSIR", "Got students!");
                 do {
                     students.add(constructStudent(cursor));
                 } while (cursor.moveToNext());
@@ -167,6 +162,8 @@ public class Students {
     }
 
     private ArrayList<Student> getStudents() {
+
+
         StudentCursor cursor = new StudentCursor(mContext,
                 mDatabase.getReadableDatabase().query(mStudentTable.getTableName(),
                         new String[]{mStudentTable.getIdColumnName(),

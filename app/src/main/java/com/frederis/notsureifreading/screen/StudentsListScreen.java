@@ -74,7 +74,13 @@ public class StudentsListScreen extends TransitionScreen implements Blueprint {
             StudentListView view = getView();
             if (view == null) return;
 
-            mToolbar.setConfig(new ToolbarOwner.Config(true, true, "Students", null, R.dimen.toolbar_elevation));
+
+            mToolbar.setConfig(new ToolbarOwner.Config.Builder()
+                    .withShowHomeEnabled(true)
+                    .withUpEnabled(true)
+                    .withTitleResId(R.string.students)
+                    .withElevationDimensionResId(R.dimen.toolbar_elevation)
+                    .build());
             mDrawerPresenter.setConfig(new DrawerPresenter.Config(true, DrawerLayout.LOCK_MODE_UNLOCKED));
 
             view.showStudents(mStudents);

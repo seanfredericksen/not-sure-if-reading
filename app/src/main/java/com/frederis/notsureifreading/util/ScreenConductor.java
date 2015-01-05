@@ -42,7 +42,7 @@ public class ScreenConductor<S extends Blueprint> implements CanShowScreen<S>, C
 
     /**
      * @param contentContainer the container used to host child views. Typically this is a {@link
-     *                  android.widget.FrameLayout} under the action bar. In this case
+     *                  android.widget.FrameLayout} under the actions bar. In this case
      *                  it is designed to hold two children - main content and a navigation
      *                  drawer.
      */

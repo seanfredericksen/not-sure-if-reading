@@ -1,5 +1,6 @@
 package com.frederis.notsureifreading;
 
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,9 +11,11 @@ import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.frederis.notsureifreading.actionbar.DrawerPresenter;
@@ -38,7 +41,7 @@ import static android.view.MenuItem.SHOW_AS_ACTION_ALWAYS;
 public class MainActivity extends ActionBarActivity implements ToolbarOwner.View, DrawerPresenter.View, ActivityResultPresenter.View {
 
     private MortarActivityScope activityScope;
-    private ToolbarOwner.MenuAction actionBarMenuAction;
+    private ToolbarOwner.MenuActions actionBarMenuActions;
     private Toolbar mToolbar;
     private ActionBarDrawerToggle drawerToggle;
 
@@ -110,29 +113,18 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
             return mainFlow.goUp() || mainFlow.goBack();
         }
 
-        return super.onOptionsItemSelected(item);
+        return actionBarMenuActions != null && actionBarMenuActions.callback.onMenuItemSelected(item) || super.onOptionsItemSelected(item);
     }
 
     /** Configure the action bar menu as required by {@link com.frederis.notsureifreading.actionbar.ToolbarOwner.View}. */
     @Override public boolean onCreateOptionsMenu(Menu menu) {
-        if (actionBarMenuAction != null) {
-            menu.add(actionBarMenuAction.title)
-                    .setShowAsActionFlags(SHOW_AS_ACTION_ALWAYS)
-                    .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                        @Override public boolean onMenuItemClick(MenuItem menuItem) {
-                            actionBarMenuAction.action.call();
-                            return true;
-                        }
-                    });
+        if (actionBarMenuActions != null) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(actionBarMenuActions.menuResource, menu);
+
+            actionBarMenuActions.callback.onConfigureOptionsMenu(menu);
         }
-        menu.add("Log Scope Hierarchy")
-                .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        Log.d("DemoActivity", MortarScopeDevHelper.scopeHierarchyToString(activityScope));
-                        return true;
-                    }
-                });
+
         return true;
     }
 
@@ -171,13 +163,13 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
         actionBar.setHomeButtonEnabled(enabled);
     }
 
-    @Override public void setTitle(CharSequence title) {
-        getSupportActionBar().setTitle(title);
+    @Override public void setTitleResId(int titleResId) {
+        getSupportActionBar().setTitle(titleResId);
     }
 
-    @Override public void setMenu(ToolbarOwner.MenuAction action) {
-        if (action != actionBarMenuAction) {
-            actionBarMenuAction = action;
+    @Override public void setMenu(ToolbarOwner.MenuActions action) {
+        if (action != actionBarMenuActions) {
+            actionBarMenuActions = action;
             invalidateOptionsMenu();
         }
     }
