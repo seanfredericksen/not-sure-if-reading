@@ -1,6 +1,7 @@
 package com.frederis.notsureifreading.view;
 
 import android.content.Context;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -37,7 +38,7 @@ public class DrawerView extends RecyclerView implements SubscriptionUtil.ListDat
 
         setHasFixedSize(true);
         setLayoutManager(new LinearLayoutManager(context));
-        addItemDecoration(new DividerItemDecoration(context, null, true, true));
+        addItemDecoration(new DividerItemDecoration(context.getResources().getDrawable(R.drawable.divider)));
     }
 
     @Override
@@ -82,7 +83,7 @@ public class DrawerView extends RecyclerView implements SubscriptionUtil.ListDat
             final NavigationDrawerItem item = mItems.get(position);
 
             holder.text.setText(item.getTextResId());
-            //TODO - Populate da icon
+            holder.icon.setImageResource(item.getIconResId());
             holder.row.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {

@@ -58,6 +58,11 @@ public class NavigationDrawer {
                     }
 
                     @Override
+                    public int getIconResId() {
+                        return R.drawable.ic_action_person;
+                    }
+
+                    @Override
                     public Object getTransitionScreen() {
                         return new StudentsListScreen();
                     }
@@ -71,6 +76,11 @@ public class NavigationDrawer {
                     }
 
                     @Override
+                    public int getIconResId() {
+                        return R.drawable.ic_action_collection;
+                    }
+
+                    @Override
                     public Object getTransitionScreen() {
                         return new RecentAssessmentListScreen();
                     }
@@ -81,6 +91,11 @@ public class NavigationDrawer {
                     @Override
                     public int getTextResId() {
                         return R.string.log;
+                    }
+
+                    @Override
+                    public int getIconResId() {
+                        return R.drawable.ic_action_storage;
                     }
 
                     @Override
