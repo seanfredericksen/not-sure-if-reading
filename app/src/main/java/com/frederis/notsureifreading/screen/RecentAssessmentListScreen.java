@@ -1,11 +1,8 @@
 package com.frederis.notsureifreading.screen;
 
-import android.app.SearchManager;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -17,7 +14,11 @@ import com.frederis.notsureifreading.actionbar.ToolbarOwner;
 import com.frederis.notsureifreading.animation.Transition;
 import com.frederis.notsureifreading.model.Assessment;
 import com.frederis.notsureifreading.model.Assessments;
+import com.frederis.notsureifreading.model.RecentAssessment;
+import com.frederis.notsureifreading.model.Student;
+import com.frederis.notsureifreading.model.StudentPopupInfo;
 import com.frederis.notsureifreading.model.Students;
+import com.frederis.notsureifreading.util.RecentAssessmentsCreator;
 import com.frederis.notsureifreading.view.RecentAssessmentListView;
 
 import java.util.ArrayList;
@@ -29,14 +30,10 @@ import dagger.Provides;
 import flow.Flow;
 import flow.Layout;
 import mortar.Blueprint;
+import mortar.PopupPresenter;
 import mortar.ViewPresenter;
 import rx.Observable;
-import rx.Observer;
-import rx.Subscriber;
-import rx.functions.Action0;
 import rx.functions.Func1;
-
-import static com.frederis.notsureifreading.view.RecentAssessmentListView.RecentAssessment;
 
 @Layout(R.layout.recent_assessment_list_view)
 @Transition({R.animator.scale_fade_in, R.animator.scale_fade_out, R.animator.scale_fade_in, R.animator.scale_fade_out})
@@ -61,8 +58,14 @@ public class RecentAssessmentListScreen extends TransitionScreen implements Blue
         }
 
         @Provides
-        Observable<ArrayList<RecentAssessment>> provideRecentAssessments(final Students students, Observable<ArrayList<Assessment>> allAssessments) {
-            return allAssessments.map(new RecentAssessmentCreator(students));
+        Observable<ArrayList<RecentAssessment>> provideRecentAssessments(RecentAssessmentsCreator recentAssessmentsCreator,
+                                                                         Observable<ArrayList<Assessment>> allAssessments) {
+            return allAssessments.map(recentAssessmentsCreator);
+        }
+
+        @Provides
+        Observable<ArrayList<Student>> provideStudents(Students students) {
+            return students.getAll();
         }
 
     }
@@ -72,15 +75,41 @@ public class RecentAssessmentListScreen extends TransitionScreen implements Blue
 
         private final Flow mFlow;
         private final Observable<ArrayList<RecentAssessment>> mAssessments;
+        private final Observable<ArrayList<Student>> mStudents;
         private final DrawerPresenter mDrawerPresenter;
         private final ToolbarOwner mActionBar;
+        private final PopupPresenter<StudentPopupInfo, Long> mStudentSelector;
 
         @Inject
-        Presenter(Flow flow, Observable<ArrayList<RecentAssessment>> assessments, DrawerPresenter drawerPresenter, ToolbarOwner actionBar) {
+        Presenter(Flow flow, Observable<ArrayList<RecentAssessment>> assessments, Observable<ArrayList<Student>> students, DrawerPresenter drawerPresenter, ToolbarOwner actionBar) {
             mFlow = flow;
             mAssessments = assessments;
+            mStudents = students;
             mDrawerPresenter = drawerPresenter;
             mActionBar = actionBar;
+            mStudentSelector = new PopupPresenter<StudentPopupInfo, Long>() {
+                @Override
+                protected void onPopupResult(Long result) {
+                    if (result != 0L) {
+                        mFlow.goTo(new PerformAssessmentScreen(result));
+                    }
+                }
+            };
+        }
+
+        public Observable<StudentPopupInfo> createInfoObservable() {
+            return mStudents.map(new Func1<ArrayList<Student>, StudentPopupInfo>() {
+                @Override
+                public StudentPopupInfo call(ArrayList<Student> students) {
+                    ArrayList<StudentPopupInfo.StudentData> data = new ArrayList<>();
+
+                    for (Student student : students) {
+                        data.add(new StudentPopupInfo.StudentData(student.getId(), student.getName()));
+                    }
+
+                    return new StudentPopupInfo(data);
+                }
+            });
         }
 
         @Override
@@ -149,54 +178,26 @@ public class RecentAssessmentListScreen extends TransitionScreen implements Blue
 
             mDrawerPresenter.setConfig(new DrawerPresenter.Config(true, DrawerLayout.LOCK_MODE_UNLOCKED));
 
+            mStudentSelector.takeView(view.getSelectStudentPopup());
+
+            view.populateAddAssessmentButton(createInfoObservable());
             view.showAssessments(mAssessments);
         }
 
-        public void onAssessmentSelected(int position) {
-            mFlow.goTo(new AssessmentScreen(position));
-        }
-
-    }
-
-    private static class RecentAssessmentCreator implements Func1<ArrayList<Assessment>, ArrayList<RecentAssessment>> {
-
-        private Students students;
-
-        public RecentAssessmentCreator(Students students) {
-            this.students = students;
-        }
-
         @Override
-        public ArrayList<RecentAssessment> call(ArrayList<Assessment> assessments) {
-            ArrayList<RecentAssessment> recentAssessments = new ArrayList<>();
-
-            for (Assessment assessment : assessments) {
-                recentAssessments.add(new RecentAssessment(assessment,
-                        students.readStudent(assessment.getStudentId()).getName(),
-                        calculateAccuracy(assessment)));
-            }
-
-            return recentAssessments;
+        public void dropView(RecentAssessmentListView view) {
+            mStudentSelector.dropView(view.getSelectStudentPopup());
+            super.dropView(view);
         }
 
-        private int calculateAccuracy(Assessment assessment) {
-            float total = (float) (assessment.getEndingWord() - assessment.getStartingWord() + 1);
-            float correct = 0.0f;
-
-            for (int i = 0; i < total; i++) {
-                long result =
-                        (i < 50
-                                ? assessment.getOneToFiftyResult()
-                                : assessment.getFiftyOneToOneHundredResult()
-                        ) & (1L << (i < 50 ? (49 - i) : (99 - i)));
-
-                if (result != 0L) {
-                    correct++;
-                }
-            }
-
-            return Math.round((correct / total) * 100f);
+        public void onAssessmentSelected(long id) {
+            mFlow.goTo(new AssessmentScreen(id));
         }
+
+        public void onAddAssessmentSelected(StudentPopupInfo info) {
+            mStudentSelector.show(info);
+        }
+
     }
 
 }

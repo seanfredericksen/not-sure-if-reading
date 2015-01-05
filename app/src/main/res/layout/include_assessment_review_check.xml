@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.frederis.notsureifreading.widget.CheckableFrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/assessment_review_button"
+    android:layout_width="48dip"
+    android:layout_height="48dip"
+    android:visibility="visible"
+    android:layout_gravity="center_vertical"
+    android:clickable="false"
+    android:focusable="true"
+    android:contentDescription="Sight word correct?">
+
+    <ImageView
+        android:id="@+id/assessment_review_icon"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="center"
+        android:src="@drawable/word_identified_fab_icon_unchecked"
+        android:contentDescription="@null"
+        android:layout_gravity="center"/>
+
+</com.frederis.notsureifreading.widget.CheckableFrameLayout>

@@ -11,19 +11,14 @@ import android.widget.TextView;
 
 import com.frederis.notsureifreading.R;
 import com.frederis.notsureifreading.decoration.DividerItemDecoration;
-import com.frederis.notsureifreading.model.Assessment;
+import com.frederis.notsureifreading.model.RecentAssessment;
 import com.frederis.notsureifreading.util.SubscriptionUtil;
-import com.frederis.notsureifreading.widget.BezelImageView;
-
-import org.joda.time.format.ISODateTimeFormat;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.TimeZone;
 
 import rx.Observable;
-
-import static com.frederis.notsureifreading.view.RecentAssessmentListView.RecentAssessment;
 
 public class RecentAssessmentRecyclerView extends RecyclerView
         implements SubscriptionUtil.ListDataHandler<ArrayList<RecentAssessment>> {

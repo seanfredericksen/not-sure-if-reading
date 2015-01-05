@@ -17,6 +17,7 @@
 
     <string name="words_description">Words: %1$d - %2$d</string>
     <string name="assessment_description">%1$s accuracy on words %2$d to %3$d</string>
+    <string name="assessment_accuracy">%1$s accuracy</string>
     <string name="students">Students</string>
     <string name="assess">Assess</string>
     <string name="assessment">Assessment</string>
@@ -24,4 +25,5 @@
     <string name="save">Save</string>
     <string name="search">Search</string>
     <string name="log">Log</string>
+    <string name="select_student">Select student...</string>
 </resources>

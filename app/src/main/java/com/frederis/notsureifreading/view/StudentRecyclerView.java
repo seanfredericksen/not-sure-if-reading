@@ -1,7 +1,6 @@
 package com.frederis.notsureifreading.view;
 
 import android.content.Context;
-import android.net.Uri;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -19,7 +18,6 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-import mortar.Mortar;
 import rx.Observable;
 
 public class StudentRecyclerView extends RecyclerView

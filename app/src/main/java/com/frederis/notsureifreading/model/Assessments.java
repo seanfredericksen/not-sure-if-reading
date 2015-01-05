@@ -83,6 +83,19 @@ public class Assessments {
         return assessments;
     }
 
+    public Observable<Assessment> getAssessment(final long assessmentId) {
+        BehaviorSubject<Assessment> assessment = BehaviorSubject.create();
+
+        Observable.create(new Observable.OnSubscribe<Assessment>() {
+            @Override
+            public void call(Subscriber<? super Assessment> subscriber) {
+                subscriber.onNext(readAssessment(assessmentId));
+            }
+        }).subscribe(assessment);
+
+        return assessment;
+    }
+
     private Observable<ArrayList<Assessment>> getAssessmentList() {
         return Observable.create(new Observable.OnSubscribe<ArrayList<Assessment>>() {
             @Override
@@ -119,6 +132,31 @@ public class Assessments {
         cursor.close();
 
         return assessments;
+    }
+
+    private Assessment readAssessment(long assessmentId) {
+        AssessmentCursor cursor = new AssessmentCursor(mContext,
+                mDatabase.getReadableDatabase().query(mAssessmentTable.getTableName(),
+                        new String[]{mAssessmentTable.getIdColumnName(),
+                                mAssessmentTable.getStudentColumn(),
+                                mAssessmentTable.getDateColumn(),
+                                mAssessmentTable.getStartingWordColumn(),
+                                mAssessmentTable.getEndingWordColumn(),
+                                mAssessmentTable.get1To50ResultsColumn(),
+                                mAssessmentTable.get51to100ResultsColumn()},
+                        mAssessmentTable.getIdColumnName() + " = ?",
+                        new String[] {Long.toString(assessmentId)},
+                        null,
+                        null,
+                        mAssessmentTable.getDateColumn() + " DESC"));
+
+        Assessment assessment = cursor.moveToFirst()
+                ? constructAssessment(cursor)
+                : new Assessment(0L, 0L, 0L, 0L, 0L, 0L, 0L);
+
+        cursor.close();
+
+        return assessment;
     }
 
     private Assessment constructAssessment(AssessmentCursor cursor) {

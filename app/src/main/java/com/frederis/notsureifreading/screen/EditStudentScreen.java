@@ -37,7 +37,6 @@ import mortar.Blueprint;
 import mortar.MortarScope;
 import mortar.ViewPresenter;
 import rx.Observable;
-import rx.functions.Action0;
 import rx.functions.Func1;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.Subject;
@@ -257,30 +256,31 @@ public class EditStudentScreen extends TransitionScreen implements HasParent<Stu
                 mImageCaptureUri = savedInstanceState.getParcelable(KEY_IMAGE_CAPTURE_URI);
             }
 
-
-            actionBar.setConfig(new ToolbarOwner.Config.Builder()
+            ToolbarOwner.Config.Builder builder = new ToolbarOwner.Config.Builder()
                     .withShowHomeEnabled(true)
                     .withUpEnabled(true)
                     .withTitleResId(R.string.empty)
-                    .withElevationDimensionResId(R.dimen.no_elevation)
-                    .withActions(new ToolbarOwner.MenuActions(R.menu.edit_student, new ToolbarOwner.MenuActions.Callback() {
-                        @Override
-                        public void onConfigureOptionsMenu(Menu menu) {
+                    .withElevationDimensionResId(R.dimen.no_elevation);
+
+            if (studentId != 0L) {
+                builder.withActions(new ToolbarOwner.MenuActions(R.menu.edit_student, new ToolbarOwner.MenuActions.Callback() {
+                    @Override
+                    public void onConfigureOptionsMenu(Menu menu) {
+                    }
+
+                    @Override
+                    public boolean onMenuItemSelected(MenuItem menuItem) {
+                        if (menuItem.getItemId() == R.id.launch_assessment) {
+                            assessStudent();
+                            return true;
                         }
 
-                        @Override
-                        public boolean onMenuItemSelected(MenuItem menuItem) {
-                            if (menuItem.getItemId() == R.id.launch_assessment) {
-                                assessStudent();
-                                return true;
-                            }
+                        return false;
+                    }
+                }));
+            }
 
-                            return false;
-                        }
-                    }))
-                    .build());
-
-
+            actionBar.setConfig(builder.build());
             drawerPresenter.setConfig(new DrawerPresenter.Config(false, DrawerLayout.LOCK_MODE_UNLOCKED));
 
             createNameObservable().subscribe(name);

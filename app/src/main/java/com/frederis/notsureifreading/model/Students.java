@@ -206,7 +206,7 @@ public class Students {
 
         Student student = cursor.moveToFirst()
                 ? constructStudent(cursor)
-                : new Student(0L, "", Uri.EMPTY, 0L, 0L);
+                : new Student(0L, "", Uri.EMPTY, 1L, 20L);
 
         cursor.close();
 

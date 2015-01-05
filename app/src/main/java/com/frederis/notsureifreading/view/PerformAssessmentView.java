@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.frederis.notsureifreading.R;
+import com.frederis.notsureifreading.model.AssessmentAnswer;
 import com.frederis.notsureifreading.model.Word;
 import com.frederis.notsureifreading.screen.PerformAssessmentScreen;
 import com.frederis.notsureifreading.util.LUtils;
@@ -55,33 +56,33 @@ public class PerformAssessmentView extends FractionalViewPager
     }
 
     public long getStartingWord() {
-        return mAdapter.getData().get(0).word.getId();
+        return mAdapter.getData().get(0).getWord().getId();
     }
 
     public long getEndingWord() {
-        ArrayList<Adapter.WordAssessment> data = mAdapter.getData();
-        return data.get(data.size() - 1).word.getId();
+        ArrayList<AssessmentAnswer> data = mAdapter.getData();
+        return data.get(data.size() - 1).getWord().getId();
     }
 
     public long get1To50Results() {
-        ArrayList<Adapter.WordAssessment> data = mAdapter.getData();
+        ArrayList<AssessmentAnswer> data = mAdapter.getData();
 
         long result = 0L;
 
         for (int i = 0; i < 50; i++) {
-            result = (result << 1) | ((i < data.size() && data.get(i).isCorrect) ? 1 : 0);
+            result = (result << 1) | ((i < data.size() && data.get(i).isCorrect()) ? 1 : 0);
         }
 
         return result;
     }
 
     public long get51To100Results() {
-        ArrayList<Adapter.WordAssessment> data = mAdapter.getData();
+        ArrayList<AssessmentAnswer> data = mAdapter.getData();
 
         long result = 0L;
 
         for (int i = 50; i < 100; i++) {
-            result = (result << 1) | ((i < data.size() && data.get(i).isCorrect) ? 1 : 0);
+            result = (result << 1) | ((i < data.size() && data.get(i).isCorrect()) ? 1 : 0);
         }
 
         return result;
@@ -91,9 +92,9 @@ public class PerformAssessmentView extends FractionalViewPager
 
         private Context mContext;
         private LUtils mLUtils;
-        private ArrayList<WordAssessment> mWordAssessments;
+        private ArrayList<AssessmentAnswer> mWordAssessments;
 
-        public Adapter(Context context, ArrayList<WordAssessment> wordAssessments) {
+        public Adapter(Context context, ArrayList<AssessmentAnswer> wordAssessments) {
             mContext = context;
             mLUtils = new LUtils(context);
             mWordAssessments = wordAssessments;
@@ -115,11 +116,11 @@ public class PerformAssessmentView extends FractionalViewPager
             return view;
         }
 
-        public ArrayList<WordAssessment> getData() {
+        public ArrayList<AssessmentAnswer> getData() {
             return mWordAssessments;
         }
 
-        public View getView(Context context, ViewGroup container, WordAssessment assessment) {
+        public View getView(Context context, ViewGroup container, AssessmentAnswer assessment) {
             View view = LayoutInflater.from(context).inflate(R.layout.perform_assessment_page_view, container, false);
 
             bindView(view, assessment);
@@ -127,14 +128,14 @@ public class PerformAssessmentView extends FractionalViewPager
             return view;
         }
 
-        public void bindView(View view, final WordAssessment assessment) {
-            ((TextView) view.findViewById(R.id.word_name)).setText(assessment.word.getText());
+        public void bindView(View view, final AssessmentAnswer assessment) {
+            ((TextView) view.findViewById(R.id.word_name)).setText(assessment.getWord().getText());
 
             final CheckableFrameLayout wordIdentifiedButton = (CheckableFrameLayout) view.findViewById(R.id.word_identified_button);
             final ImageView wordIdentifiedIcon = (ImageView) wordIdentifiedButton.findViewById(R.id.word_identified_icon);
 
-            wordIdentifiedButton.setChecked(assessment.isCorrect, false);
-            mLUtils.setOrAnimateWordIdentifiedIcon(wordIdentifiedIcon, assessment.isCorrect, false);
+            wordIdentifiedButton.setChecked(assessment.isCorrect(), false);
+            mLUtils.setOrAnimateWordIdentifiedIcon(wordIdentifiedIcon, assessment.isCorrect(), false);
 
             wordIdentifiedButton.setOnClickListener(new OnClickListener() {
                 @Override
@@ -144,7 +145,7 @@ public class PerformAssessmentView extends FractionalViewPager
                     wordIdentifiedButton.setChecked(isChecked, true);
                     mLUtils.setOrAnimateWordIdentifiedIcon(wordIdentifiedIcon, isChecked, true);
 
-                    assessment.isCorrect = isChecked;
+                    assessment.setIsCorrect(isChecked);
                 }
             });
         }
@@ -159,28 +160,14 @@ public class PerformAssessmentView extends FractionalViewPager
             return view == object;
         }
 
-        public static ArrayList<WordAssessment> buildAssessments(ArrayList<Word> words) {
-            ArrayList<WordAssessment> assessments = new ArrayList<>();
+        public static ArrayList<AssessmentAnswer> buildAssessments(ArrayList<Word> words) {
+            ArrayList<AssessmentAnswer> assessments = new ArrayList<>();
 
             for (Word word : words) {
-                assessments.add(new WordAssessment(word));
+                assessments.add(new AssessmentAnswer(word));
             }
 
             return assessments;
-        }
-
-        public static class WordAssessment {
-            Word word;
-            boolean isCorrect;
-
-            public WordAssessment(Word word) {
-                this(word, false);
-            }
-
-            public WordAssessment(Word word, boolean correct) {
-                this.word = word;
-                this.isCorrect = correct;
-            }
         }
 
     }

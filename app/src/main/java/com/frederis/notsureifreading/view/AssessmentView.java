@@ -8,8 +8,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.frederis.notsureifreading.R;
+import com.frederis.notsureifreading.model.AssessmentAnswer;
 import com.frederis.notsureifreading.screen.AssessmentScreen;
 import com.frederis.notsureifreading.util.SubscriptionUtil;
+
+import java.util.ArrayList;
 
 import javax.inject.Inject;
 
@@ -23,9 +26,11 @@ public class AssessmentView extends FrameLayout {
 
     final private CompositeSubscription mCompositeSubscription;
 
-    private TextView mAssessmentName;
-    private TextView mAssessmentId;
-
+    private TextView mAssessmentWords;
+    private TextView mAssessmentDate;
+    private TextView mAssessmentAccuracy;
+    private TextView mStudentName;
+    private AssessmentWordsRecyclerView mAssessmentAnswers;
 
     public AssessmentView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -33,8 +38,12 @@ public class AssessmentView extends FrameLayout {
         Mortar.inject(context, this);
 
         LayoutInflater.from(context).inflate(R.layout.assessment_view_root, this, true);
-        mAssessmentName = (TextView) findViewById(R.id.assessment_name);
-        mAssessmentId = (TextView) findViewById(R.id.assessment_id);
+
+        mStudentName = (TextView) findViewById(R.id.assessment_student_name);
+        mAssessmentWords = (TextView) findViewById(R.id.assessment_words);
+        mAssessmentDate = (TextView) findViewById(R.id.assessment_date);
+        mAssessmentAccuracy = (TextView) findViewById(R.id.assessment_accuracy);
+        mAssessmentAnswers = (AssessmentWordsRecyclerView) findViewById(R.id.assessment_answers_recycler);
 
         mCompositeSubscription = new CompositeSubscription();
     }
@@ -58,14 +67,24 @@ public class AssessmentView extends FrameLayout {
         presenter.visibilityChanged(visibility == VISIBLE);
     }
 
-    public void showAssessmentName(Observable<String> assessmentName) {
-        mCompositeSubscription.add(SubscriptionUtil.subscribeTextViewText(assessmentName, mAssessmentName));
-
+    public void showAssessmentWords(Observable<String> assessmentWords) {
+        mCompositeSubscription.add(SubscriptionUtil.subscribeTextViewText(assessmentWords, mAssessmentWords));
     }
 
-    public void showAssessmentId(Observable<String> assessmentId) {
-        mCompositeSubscription.add(SubscriptionUtil.subscribeTextViewText(assessmentId, mAssessmentId));
+    public void showAssessmenDate(Observable<String> assessmentDate) {
+        mCompositeSubscription.add(SubscriptionUtil.subscribeTextViewText(assessmentDate, mAssessmentDate));
+    }
 
+    public void showAssessmentAccuracy(Observable<String> assessmentAccuracy) {
+        mCompositeSubscription.add(SubscriptionUtil.subscribeTextViewText(assessmentAccuracy, mAssessmentAccuracy));
+    }
+
+    public void showAssessmentAnswers(Observable<ArrayList<AssessmentAnswer>> assessmentAnswers) {
+        mCompositeSubscription.add(mAssessmentAnswers.showAssessmentAnswers(assessmentAnswers));
+    }
+
+    public void showStudentName(Observable<String> studentName) {
+        mCompositeSubscription.add(SubscriptionUtil.subscribeTextViewText(studentName, mStudentName));
     }
 
 }

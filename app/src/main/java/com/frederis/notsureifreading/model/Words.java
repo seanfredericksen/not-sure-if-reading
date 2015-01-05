@@ -78,13 +78,21 @@ public class Words {
         });
     }
 
-    private ArrayList<Word> getStudentsWords(Student student) {
+    public ArrayList<Word> getStudentsWords(Student student) {
+        return getWordSet(student.getStartingWord(), student.getEndingWord());
+    }
+
+    public ArrayList<Word> getAssessmentWords(Assessment assessment) {
+        return getWordSet(assessment.getStartingWord(), assessment.getEndingWord());
+    }
+
+    private ArrayList<Word> getWordSet(long startingWordId, long endingWordId) {
         WordCursor cursor = new WordCursor(mContext,
                 mDatabase.getReadableDatabase().query(mWordTable.getTableName(),
                         new String[] {mWordTable.getIdColumnName(),
-                                      mWordTable.getWordColumn()},
+                                mWordTable.getWordColumn()},
                         mWordTable.getIdColumnName() + " >= ? AND " + mWordTable.getIdColumnName() + " <= ?" ,
-                        new String[] {Long.toString(student.getStartingWord()), Long.toString(student.getEndingWord())},
+                        new String[] {Long.toString(startingWordId), Long.toString(endingWordId)},
                         null,
                         null,
                         null));

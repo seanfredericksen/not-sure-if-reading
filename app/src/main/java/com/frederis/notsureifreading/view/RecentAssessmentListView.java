@@ -13,7 +13,9 @@ import android.widget.ListView;
 
 import com.frederis.notsureifreading.R;
 import com.frederis.notsureifreading.model.Assessment;
+import com.frederis.notsureifreading.model.RecentAssessment;
 import com.frederis.notsureifreading.model.Student;
+import com.frederis.notsureifreading.model.StudentPopupInfo;
 import com.frederis.notsureifreading.screen.RecentAssessmentListScreen;
 
 import java.util.ArrayList;
@@ -23,13 +25,19 @@ import javax.inject.Inject;
 
 import mortar.Mortar;
 import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.subscriptions.CompositeSubscription;
 
 public class RecentAssessmentListView extends FrameLayout {
 
     @Inject RecentAssessmentListScreen.Presenter presenter;
 
+    private SelectStudentPopup mSelectStudentPopup;
     private RecentAssessmentRecyclerView mRecycler;
     private View mAddAssessment;
+
+    private CompositeSubscription mCompositeSubscription;
 
 
     public RecentAssessmentListView(Context context, AttributeSet attrs) {
@@ -58,20 +66,22 @@ public class RecentAssessmentListView extends FrameLayout {
         mRecycler = (RecentAssessmentRecyclerView) findViewById(R.id.recent_assessment_recycler_view);
         mAddAssessment = findViewById(R.id.add_student_button);
 
-        mAddAssessment.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            }
-        });
-
         mRecycler.setOnAssessmentSelectedListener(new RecentAssessmentRecyclerView.OnAssessmentSelectedListener() {
             @Override
             public void onAssessmentSelected(long id) {
-
+                presenter.onAssessmentSelected(id);
             }
         });
 
         Mortar.inject(context, this);
+
+        mSelectStudentPopup = new SelectStudentPopup(context);
+
+        mCompositeSubscription = new CompositeSubscription();
+    }
+
+    public SelectStudentPopup getSelectStudentPopup() {
+        return mSelectStudentPopup;
     }
 
 
@@ -82,6 +92,9 @@ public class RecentAssessmentListView extends FrameLayout {
 
     @Override protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+
+        mCompositeSubscription.clear();
+
         presenter.dropView(this);
     }
 
@@ -89,18 +102,20 @@ public class RecentAssessmentListView extends FrameLayout {
         mRecycler.showAssessments(assessments);
     }
 
-    public static class RecentAssessment {
-
-        public Assessment assessment;
-        public String studentName;
-        public int percentAccuracy;
-
-        public RecentAssessment(Assessment assessment, String studentName, int percentAccuracy) {
-            this.assessment = assessment;
-            this.studentName = studentName;
-            this.percentAccuracy = percentAccuracy;
-        }
-
+    public void populateAddAssessmentButton(Observable<StudentPopupInfo> info) {
+        mCompositeSubscription.add(info
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<StudentPopupInfo>() {
+                    @Override
+                    public void call(final StudentPopupInfo info) {
+                        mAddAssessment.setOnClickListener(new OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                presenter.onAddAssessmentSelected(info);
+                            }
+                        });
+                    }
+                }));
     }
 
 }
