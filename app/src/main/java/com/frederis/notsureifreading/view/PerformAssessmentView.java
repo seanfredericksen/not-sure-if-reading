@@ -24,6 +24,9 @@ import javax.inject.Inject;
 
 import mortar.Mortar;
 import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.subscriptions.CompositeSubscription;
 
 public class PerformAssessmentView extends FractionalViewPager
     implements SubscriptionUtil.PagerDataHandler<ArrayList<Word>> {
@@ -31,11 +34,14 @@ public class PerformAssessmentView extends FractionalViewPager
     @Inject PerformAssessmentScreen.Presenter mPresenter;
 
     private Adapter mAdapter;
+    private CompositeSubscription mCompositeSubscription;
 
     public PerformAssessmentView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         Mortar.inject(context, this);
+
+        mCompositeSubscription = new CompositeSubscription();
     }
 
     @Override protected void onFinishInflate() {
@@ -47,9 +53,10 @@ public class PerformAssessmentView extends FractionalViewPager
     @Override protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
 
+        mCompositeSubscription.clear();
+
         mPresenter.dropView(this);
     }
-
 
     public void showWords(Observable<ArrayList<Word>> words) {
         SubscriptionUtil.subscribeViewPager(words, this);

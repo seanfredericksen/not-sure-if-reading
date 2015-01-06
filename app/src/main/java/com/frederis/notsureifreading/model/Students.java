@@ -94,7 +94,10 @@ public class Students {
             public void call(Subscriber<? super Student> subscriber) {
                 subscriber.onNext(readStudent(studentId));
             }
-        }).subscribe(student);
+        })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(student);
 
         return student;
     }

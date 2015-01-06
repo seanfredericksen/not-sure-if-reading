@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.SharedPreferences;
 
 import com.frederis.notsureifreading.database.cursor.AssessmentCursor;
+import com.frederis.notsureifreading.database.cursor.LogCursor;
 import com.frederis.notsureifreading.database.cursor.StudentCursor;
 import com.frederis.notsureifreading.database.cursor.WordCursor;
 
@@ -15,7 +16,7 @@ import dagger.Provides;
 import static android.content.Context.MODE_PRIVATE;
 
 @Module(
-        injects = {StudentCursor.class, WordCursor.class, AssessmentCursor.class},
+        injects = {StudentCursor.class, WordCursor.class, AssessmentCursor.class, LogCursor.class},
         complete = false,
         library = true
 )

@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.frederis.notsureifreading.ForApplication;
 import com.frederis.notsureifreading.database.table.AssessmentTable;
+import com.frederis.notsureifreading.database.table.LogTable;
 import com.frederis.notsureifreading.database.table.StudentTable;
 import com.frederis.notsureifreading.database.table.WordTable;
 
@@ -16,17 +17,20 @@ public class NsirDatabase extends SQLiteOpenHelper {
     private WordTable mWordTable;
     private StudentTable mStudentTable;
     private AssessmentTable mAssessmentTable;
+    private LogTable mLogTable;
 
     @Inject
     public NsirDatabase(@ForApplication Context context,
                         WordTable wordTable,
                         StudentTable studentTable,
-                        AssessmentTable assessmentTable) {
+                        AssessmentTable assessmentTable,
+                        LogTable logTable) {
         super(context, "nsir.db", null, 1);
 
         mWordTable = wordTable;
         mStudentTable = studentTable;
         mAssessmentTable = assessmentTable;
+        mLogTable = logTable;
     }
 
     @Override
@@ -34,6 +38,7 @@ public class NsirDatabase extends SQLiteOpenHelper {
         mWordTable.onCreate(db);
         mStudentTable.onCreate(db);
         mAssessmentTable.onCreate(db);
+        mLogTable.onCreate(db);
     }
 
     @Override

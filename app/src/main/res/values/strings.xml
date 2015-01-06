@@ -25,5 +25,6 @@
     <string name="save">Save</string>
     <string name="search">Search</string>
     <string name="log">Log</string>
+    <string name="logs">Logs</string>
     <string name="select_student">Select student...</string>
 </resources>

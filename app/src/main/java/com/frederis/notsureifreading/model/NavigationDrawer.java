@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 
 import com.frederis.notsureifreading.ForApplication;
 import com.frederis.notsureifreading.R;
+import com.frederis.notsureifreading.screen.LogScreen;
 import com.frederis.notsureifreading.screen.RecentAssessmentListScreen;
 import com.frederis.notsureifreading.screen.StudentsListScreen;
 
@@ -13,7 +14,6 @@ import java.util.ArrayList;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import flow.Flow;
 import rx.Observable;
 import rx.Subscriber;
 import rx.subjects.BehaviorSubject;
@@ -100,7 +100,7 @@ public class NavigationDrawer {
 
                     @Override
                     public Object getTransitionScreen() {
-                        return new StudentsListScreen();
+                        return new LogScreen();
                     }
 
                 });

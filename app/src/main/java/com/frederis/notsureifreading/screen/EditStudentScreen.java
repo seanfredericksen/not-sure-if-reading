@@ -16,6 +16,8 @@ import com.frederis.notsureifreading.TransitionScreen;
 import com.frederis.notsureifreading.actionbar.DrawerPresenter;
 import com.frederis.notsureifreading.actionbar.ToolbarOwner;
 import com.frederis.notsureifreading.animation.Transition;
+import com.frederis.notsureifreading.model.Log;
+import com.frederis.notsureifreading.model.Logs;
 import com.frederis.notsureifreading.model.Student;
 import com.frederis.notsureifreading.model.Students;
 import com.frederis.notsureifreading.presenter.ActivityResultPresenter;
@@ -78,10 +80,11 @@ public class EditStudentScreen extends TransitionScreen implements HasParent<Stu
         Presenter providePresenter(Students students,
                                    Observable<Student> student,
                                    @MainScope Flow flow,
+                                   Logs logs,
                                    DrawerPresenter drawerPresenter,
                                    ToolbarOwner actionBar,
                                    ActivityResultRegistrar activityResultRegistrar) {
-            return new Presenter(mStudentId, students, student, flow, drawerPresenter, actionBar, activityResultRegistrar);
+            return new Presenter(mStudentId, students, student, flow, logs, drawerPresenter, actionBar, activityResultRegistrar);
         }
 
     }
@@ -96,6 +99,7 @@ public class EditStudentScreen extends TransitionScreen implements HasParent<Stu
         private final Students students;
         private final Observable<Student> student;
         private final Flow flow;
+        private final Logs logs;
         private final DrawerPresenter drawerPresenter;
         private final ToolbarOwner actionBar;
         private final ActivityResultRegistrar activityResultRegistrar;
@@ -111,6 +115,7 @@ public class EditStudentScreen extends TransitionScreen implements HasParent<Stu
                          Students students,
                          Observable<Student> student,
                          Flow flow,
+                         Logs logs,
                          DrawerPresenter drawerPresenter,
                          ToolbarOwner actionBar,
                          ActivityResultRegistrar activityResultRegistrar) {
@@ -118,6 +123,7 @@ public class EditStudentScreen extends TransitionScreen implements HasParent<Stu
             this.students = students;
             this.student = student;
             this.flow = flow;
+            this.logs = logs;
             this.drawerPresenter = drawerPresenter;
             this.actionBar = actionBar;
             this.activityResultRegistrar = activityResultRegistrar;
@@ -180,6 +186,12 @@ public class EditStudentScreen extends TransitionScreen implements HasParent<Stu
                                           long startingWord,
                                           long endingWord) {
             students.updateOrInsertStudent(new Student(studentId, name, mImageCaptureUri != null ? mImageCaptureUri : Student.IMAGE_UNCHANGED, startingWord, endingWord));
+
+            if (studentId == 0L) {
+                logs.updateOrInsertLog(new Log("Added student " + name));
+            } else {
+                logs.updateOrInsertLog(new Log("Updated student " + name + ", with words: " + startingWord + "-" + endingWord));
+            }
         }
 
         public void captureImage() {
