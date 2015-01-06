@@ -124,7 +124,7 @@ public class PerformAssessmentScreen extends TransitionScreen implements Bluepri
                         @Override
                         public boolean onMenuItemSelected(MenuItem menuItem) {
                             if (menuItem.getItemId() == R.id.save_assessment) {
-                                mAssessments.updateOrInsertAssessment(getAssessment());
+                                mAssessments.updateOrInsert(getAssessment());
                                 mLogs.writeAssessmentCompletionLogForStudent(mStudentId);
                                 mFlow.goBack();
                                 return true;

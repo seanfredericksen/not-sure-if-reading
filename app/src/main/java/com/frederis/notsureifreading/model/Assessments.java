@@ -2,12 +2,15 @@ package com.frederis.notsureifreading.model;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 
 import com.frederis.notsureifreading.ForApplication;
+import com.frederis.notsureifreading.database.DatabaseDao;
 import com.frederis.notsureifreading.database.NsirDatabase;
 import com.frederis.notsureifreading.database.cursor.AssessmentCursor;
 import com.frederis.notsureifreading.database.cursor.StudentCursor;
 import com.frederis.notsureifreading.database.table.AssessmentTable;
+import com.frederis.notsureifreading.database.table.DatabaseTable;
 
 import java.util.ArrayList;
 
@@ -21,22 +24,45 @@ import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
 @Singleton
-public class Assessments {
-
-    private PublishSubject<Object> mAssessmentsUpdated = PublishSubject.create();
+public class Assessments extends DatabaseDao<Assessment, AssessmentTable, AssessmentCursor, Assessments.Query> {
 
     private Context mContext;
     private AssessmentTable mAssessmentTable;
-    private NsirDatabase mDatabase;
 
     @Inject
     public Assessments(@ForApplication Context context, AssessmentTable assessmentTable, NsirDatabase database) {
+        super(database, assessmentTable);
+
         mContext = context;
         mAssessmentTable = assessmentTable;
-        mDatabase = database;
     }
 
-    public long updateOrInsertAssessment(Assessment assessment) {
+    public Observable<ArrayList<Assessment>> getAll() {
+        return queryForSet(
+                queryBuilder()
+                    .withId()
+                    .withStudentId()
+                    .withDescendingDate()
+                    .withStartingWord()
+                    .withEndingWord()
+                    .withResults()
+        );
+    }
+
+    public Observable<Assessment> getAssessment(long assessmentId) {
+        return queryForItem(assessmentId,
+                queryBuilder()
+                    .withId(assessmentId)
+                    .withStudentId()
+                    .withDate()
+                    .withStartingWord()
+                    .withEndingWord()
+                    .withResults()
+        );
+    }
+
+    @Override
+    protected ContentValues buildValues(Assessment assessment) {
         final ContentValues values = new ContentValues();
         values.put(mAssessmentTable.getStudentColumn(), assessment.getStudentId());
         values.put(mAssessmentTable.getDateColumn(), assessment.getDate());
@@ -45,82 +71,25 @@ public class Assessments {
         values.put(mAssessmentTable.get1To50ResultsColumn(), assessment.getOneToFiftyResult());
         values.put(mAssessmentTable.get51to100ResultsColumn(), assessment.getFiftyOneToOneHundredResult());
 
-        long id = (assessment.getId() == 0L)
-                ? insertAssessment(values)
-                : updateAssessment(assessment.getId(), values);
-
-        notifyOfUpdates();
-
-        return id;
+        return values;
     }
 
-    private long insertAssessment(ContentValues values) {
-        return mDatabase.getWritableDatabase().insert(mAssessmentTable.getTableName(), null, values);
+    @Override
+    protected Query createQuery(AssessmentTable table, NsirDatabase database) {
+        return new Query(table, new CursorBuilder(mContext), database);
     }
 
-    private long updateAssessment(long studentId, ContentValues values) {
-        return mDatabase.getWritableDatabase().update(mAssessmentTable.getTableName(),
-                values,
-                mAssessmentTable.getIdColumnName() + " = ?",
-                new String[]{Long.toString(studentId)});
+    @Override
+    protected Assessment buildObject(AssessmentCursor cursor) {
+        if (cursor.moveToFirst()) {
+            return constructAssessment(cursor);
+        } else {
+            return new Assessment(0L, 0L, 0L, 0L, 0L, 0L, 0L);
+        }
     }
 
-    private void notifyOfUpdates() {
-        mAssessmentsUpdated.onNext(new Object());
-    }
-
-    public Observable<ArrayList<Assessment>> getAll() {
-        BehaviorSubject<ArrayList<Assessment>> assessments = BehaviorSubject.create(new ArrayList<Assessment>());
-
-        getAssessmentList().subscribe(assessments);
-        mAssessmentsUpdated.flatMap(new Func1<Object, Observable<ArrayList<Assessment>>>() {
-            @Override
-            public Observable<ArrayList<Assessment>> call(Object o) {
-                return getAssessmentList();
-            }
-        }).subscribe(assessments);
-
-        return assessments;
-    }
-
-    public Observable<Assessment> getAssessment(final long assessmentId) {
-        BehaviorSubject<Assessment> assessment = BehaviorSubject.create();
-
-        Observable.create(new Observable.OnSubscribe<Assessment>() {
-            @Override
-            public void call(Subscriber<? super Assessment> subscriber) {
-                subscriber.onNext(readAssessment(assessmentId));
-            }
-        }).subscribe(assessment);
-
-        return assessment;
-    }
-
-    private Observable<ArrayList<Assessment>> getAssessmentList() {
-        return Observable.create(new Observable.OnSubscribe<ArrayList<Assessment>>() {
-            @Override
-            public void call(Subscriber<? super ArrayList<Assessment>> subscriber) {
-                subscriber.onNext(getAssessments());
-            }
-        });
-    }
-
-    private ArrayList<Assessment> getAssessments() {
-        AssessmentCursor cursor = new AssessmentCursor(mContext,
-                mDatabase.getReadableDatabase().query(mAssessmentTable.getTableName(),
-                        new String[]{mAssessmentTable.getIdColumnName(),
-                                mAssessmentTable.getStudentColumn(),
-                                mAssessmentTable.getDateColumn(),
-                                mAssessmentTable.getStartingWordColumn(),
-                                mAssessmentTable.getEndingWordColumn(),
-                                mAssessmentTable.get1To50ResultsColumn(),
-                                mAssessmentTable.get51to100ResultsColumn()},
-                        null,
-                        null,
-                        null,
-                        null,
-                        mAssessmentTable.getDateColumn() + " DESC"));
-
+    @Override
+    protected ArrayList<Assessment> buildObjectList(AssessmentCursor cursor) {
         ArrayList<Assessment> assessments = new ArrayList<>();
 
         if (cursor.moveToFirst()) {
@@ -129,34 +98,7 @@ public class Assessments {
             } while (cursor.moveToNext());
         }
 
-        cursor.close();
-
         return assessments;
-    }
-
-    private Assessment readAssessment(long assessmentId) {
-        AssessmentCursor cursor = new AssessmentCursor(mContext,
-                mDatabase.getReadableDatabase().query(mAssessmentTable.getTableName(),
-                        new String[]{mAssessmentTable.getIdColumnName(),
-                                mAssessmentTable.getStudentColumn(),
-                                mAssessmentTable.getDateColumn(),
-                                mAssessmentTable.getStartingWordColumn(),
-                                mAssessmentTable.getEndingWordColumn(),
-                                mAssessmentTable.get1To50ResultsColumn(),
-                                mAssessmentTable.get51to100ResultsColumn()},
-                        mAssessmentTable.getIdColumnName() + " = ?",
-                        new String[] {Long.toString(assessmentId)},
-                        null,
-                        null,
-                        mAssessmentTable.getDateColumn() + " DESC"));
-
-        Assessment assessment = cursor.moveToFirst()
-                ? constructAssessment(cursor)
-                : new Assessment(0L, 0L, 0L, 0L, 0L, 0L, 0L);
-
-        cursor.close();
-
-        return assessment;
     }
 
     private Assessment constructAssessment(AssessmentCursor cursor) {
@@ -168,5 +110,72 @@ public class Assessments {
                 cursor.get1To50Results(),
                 cursor.get51To100Results());
     }
+
+    private static class CursorBuilder implements DatabaseDao.CursorBuilder<AssessmentCursor> {
+
+        private Context mContext;
+
+        public CursorBuilder(Context context) {
+            mContext = context;
+        }
+
+        @Override
+        public AssessmentCursor buildCursor(Cursor cursor) {
+            return new AssessmentCursor(mContext, cursor);
+        }
+    }
+
+    public static class Query extends DatabaseDao.Query<AssessmentCursor> {
+
+        private AssessmentTable mTable;
+
+        public Query(AssessmentTable table, CursorBuilder cursorBuilder, NsirDatabase database) {
+            super(table, cursorBuilder, database);
+
+            mTable = table;
+        }
+
+        public Query withId() {
+            addColumn(mTable.getIdColumnName());
+            return this;
+        }
+
+        public Query withId(long id) {
+            addSelection(mTable.getIdColumnName() + " = ?", Long.toString(id));
+            return withId();
+        }
+
+        public Query withStudentId() {
+            addColumn(mTable.getStudentColumn());
+            return this;
+        }
+
+        public Query withDate() {
+            addColumn(mTable.getDateColumn());
+            return this;
+        }
+
+        public Query withStartingWord() {
+            addColumn(mTable.getStartingWordColumn());
+            return this;
+        }
+
+        public Query withEndingWord() {
+            addColumn(mTable.getEndingWordColumn());
+            return this;
+        }
+
+        public Query withResults() {
+            addColumn(mTable.get1To50ResultsColumn());
+            addColumn(mTable.get51to100ResultsColumn());
+            return this;
+        }
+
+        public Query withDescendingDate() {
+            setOrderBy(mTable.getDateColumn() + " DESC");
+            return withDate();
+        }
+    }
+
 
 }

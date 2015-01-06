@@ -1,6 +1,8 @@
 package com.frederis.notsureifreading.model;
 
-public class Assessment {
+import com.frederis.notsureifreading.database.DatabaseDao;
+
+public class Assessment implements DatabaseDao.DatabaseObject {
 
     private final long mId;
     private final long mStudentId;
@@ -26,6 +28,7 @@ public class Assessment {
         mFiftyOneToOneHundredResult = fiftyOneToOneHundredResult;
     }
 
+    @Override
     public long getId() {
         return mId;
     }
