@@ -5,8 +5,6 @@ import android.os.Bundle;
 import com.frederis.notsureifreading.CoreBlueprint;
 import com.frederis.notsureifreading.R;
 import com.frederis.notsureifreading.actionbar.DrawerPresenter;
-import com.frederis.notsureifreading.model.Assessment;
-import com.frederis.notsureifreading.model.Assessments;
 import com.frederis.notsureifreading.model.NavigationDrawer;
 import com.frederis.notsureifreading.model.NavigationDrawerItem;
 import com.frederis.notsureifreading.view.DrawerView;

@@ -11,8 +11,8 @@ import com.frederis.notsureifreading.TransitionScreen;
 import com.frederis.notsureifreading.actionbar.ToolbarOwner;
 import com.frederis.notsureifreading.animation.Transition;
 import com.frederis.notsureifreading.model.Assessment;
-import com.frederis.notsureifreading.model.Assessments;
-import com.frederis.notsureifreading.model.Log;
+import com.frederis.notsureifreading.model.AssessmentModel;
+import com.frederis.notsureifreading.model.AssessmentModelImpl;
 import com.frederis.notsureifreading.model.Logs;
 import com.frederis.notsureifreading.model.Student;
 import com.frederis.notsureifreading.model.Students;
@@ -32,11 +32,7 @@ import flow.Layout;
 import mortar.Blueprint;
 import mortar.ViewPresenter;
 import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action0;
-import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
 @Layout(R.layout.perform_assessment_view)
 @Transition({R.animator.slide_in_right, R.animator.slide_out_left, R.animator.slide_in_left, R.animator.slide_out_right})
@@ -77,7 +73,7 @@ public class PerformAssessmentScreen extends TransitionScreen implements Bluepri
         }
 
         @Provides
-        Presenter providePresenter(Observable<ArrayList<Word>> words, Assessments assessments, Observable<String> studentName, Logs logs, @MainScope Flow flow, ToolbarOwner toolbarOwner) {
+        Presenter providePresenter(Observable<ArrayList<Word>> words, AssessmentModel assessments, Observable<String> studentName, Logs logs, @MainScope Flow flow, ToolbarOwner toolbarOwner) {
             return new Presenter(mStudentId, words, assessments, studentName, logs, flow, toolbarOwner);
         }
 
@@ -88,14 +84,14 @@ public class PerformAssessmentScreen extends TransitionScreen implements Bluepri
 
         private final long mStudentId;
         private final Observable<ArrayList<Word>> mWords;
-        private final Assessments mAssessments;
+        private final AssessmentModel mAssessments;
         private final Observable<String> mStudentName;
         private final Logs mLogs;
         private final Flow mFlow;
         private final ToolbarOwner mActionBar;
 
         @Inject
-        Presenter(long studentId, Observable<ArrayList<Word>> words, Assessments assessments, Observable<String> studentName, Logs logs, Flow flow, ToolbarOwner actionBar) {
+        Presenter(long studentId, Observable<ArrayList<Word>> words, AssessmentModel assessments, Observable<String> studentName, Logs logs, Flow flow, ToolbarOwner actionBar) {
             mStudentId = studentId;
             mFlow = flow;
             mLogs = logs;

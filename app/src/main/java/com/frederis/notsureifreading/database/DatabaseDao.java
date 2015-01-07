@@ -10,12 +10,16 @@ import java.util.ArrayList;
 
 import rx.Observable;
 import rx.Subscriber;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
-public abstract class DatabaseDao<T extends DatabaseDao.DatabaseObject, R extends DatabaseTable, C extends CursorWrapper, Q extends DatabaseDao.Query<C>> {
+public abstract class DatabaseDao<T extends DatabaseDao.DatabaseObject,
+        R extends DatabaseTable,
+        C extends CursorWrapper,
+        Q extends DatabaseDao.Query<C>> {
 
     private PublishSubject<Long> mUpdater = PublishSubject.create();
 
@@ -27,14 +31,23 @@ public abstract class DatabaseDao<T extends DatabaseDao.DatabaseObject, R extend
         mTable = table;
     }
 
-    public long updateOrInsert(T value) {
-        long id = (value.getId() == 0L)
-                ? insert(buildValues(value))
-                : update(value.getId(), buildValues(value));
+    public void updateOrInsert(T value) {
+        updateOrInsert(Observable.just(value)
+                .observeOn(Schedulers.io())
+                .subscribeOn(Schedulers.io()));
+    }
 
-        notifyOfUpdates(id);
+    private void updateOrInsert(Observable<T> value) {
+        value.subscribe(new Action1<T>() {
+            @Override
+            public void call(T t) {
+                long id = (t.getId() == 0L)
+                        ? insert(buildValues(t))
+                        : update(t.getId(), buildValues(t));
 
-        return id;
+                notifyOfUpdates(id);
+            }
+        });
     }
 
     protected Observable<ArrayList<T>> queryForSet(final Q query) {
@@ -74,11 +87,6 @@ public abstract class DatabaseDao<T extends DatabaseDao.DatabaseObject, R extend
         return Observable.create(new Observable.OnSubscribe<ArrayList<T>>() {
                                      @Override
                                      public void call(Subscriber<? super ArrayList<T>> subscriber) {
-                                         try {
-                                             Thread.sleep(10000);
-                                         } catch (Exception e) {
-                                         }
-
                                          C cursor = query.execute();
 
                                          ArrayList<T> objects = buildObjectList(cursor);
@@ -89,15 +97,7 @@ public abstract class DatabaseDao<T extends DatabaseDao.DatabaseObject, R extend
                                      }
                                  }
 
-        ).
-
-                observeOn(Schedulers.io()
-
-                ).
-
-                subscribeOn(Schedulers.io()
-
-                );
+        ).observeOn(Schedulers.io()).subscribeOn(Schedulers.io());
     }
 
     private Observable<T> buildSingleItemObservable(final Q query) {

@@ -1,6 +1,5 @@
 package com.frederis.notsureifreading;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -47,10 +46,6 @@ public class CoreBlueprint implements Blueprint {
         @MainScope
         Flow provideFlow(Presenter presenter) {
             return presenter.getFlow();
-        }
-
-        @Provides @ForApplication Context providesContext(Application application) {
-            return application;
         }
     }
 

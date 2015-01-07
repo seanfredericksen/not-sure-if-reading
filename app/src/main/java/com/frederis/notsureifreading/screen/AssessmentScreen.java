@@ -11,13 +11,13 @@ import com.frederis.notsureifreading.actionbar.ToolbarOwner;
 import com.frederis.notsureifreading.animation.Transition;
 import com.frederis.notsureifreading.model.Assessment;
 import com.frederis.notsureifreading.model.AssessmentAnswer;
-import com.frederis.notsureifreading.model.Assessments;
+import com.frederis.notsureifreading.model.AssessmentModel;
+import com.frederis.notsureifreading.model.AssessmentModelImpl;
 import com.frederis.notsureifreading.model.RecentAssessment;
 import com.frederis.notsureifreading.model.Word;
 import com.frederis.notsureifreading.model.Words;
 import com.frederis.notsureifreading.util.RecentAssessmentCreator;
 import com.frederis.notsureifreading.view.AssessmentView;
-import com.frederis.notsureifreading.view.RecentAssessmentListView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -64,7 +64,7 @@ public class AssessmentScreen implements HasParent<RecentAssessmentListScreen>, 
     public class Module {
 
         @Provides
-        Observable<Assessment> provideAssessment(Assessments assessments) {
+        Observable<Assessment> provideAssessment(AssessmentModel assessments) {
             return assessments.getAssessment(mAssessmentId);
         }
 

@@ -3,41 +3,32 @@ package com.frederis.notsureifreading.model;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.util.*;
 
-import com.frederis.notsureifreading.ForApplication;
 import com.frederis.notsureifreading.database.DatabaseDao;
 import com.frederis.notsureifreading.database.NsirDatabase;
 import com.frederis.notsureifreading.database.cursor.AssessmentCursor;
-import com.frederis.notsureifreading.database.cursor.StudentCursor;
 import com.frederis.notsureifreading.database.table.AssessmentTable;
-import com.frederis.notsureifreading.database.table.DatabaseTable;
 
 import java.util.ArrayList;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import rx.Observable;
-import rx.Subscriber;
-import rx.functions.Func1;
-import rx.subjects.BehaviorSubject;
-import rx.subjects.PublishSubject;
 
-@Singleton
-public class Assessments extends DatabaseDao<Assessment, AssessmentTable, AssessmentCursor, Assessments.Query> {
+public class AssessmentModelImpl extends DatabaseDao<Assessment, AssessmentTable, AssessmentCursor, AssessmentModelImpl.Query>
+    implements AssessmentModel {
 
     private Context mContext;
     private AssessmentTable mAssessmentTable;
 
-    @Inject
-    public Assessments(@ForApplication Context context, AssessmentTable assessmentTable, NsirDatabase database) {
+    public AssessmentModelImpl(Context context, AssessmentTable assessmentTable, NsirDatabase database) {
         super(database, assessmentTable);
 
         mContext = context;
         mAssessmentTable = assessmentTable;
     }
 
-    public Observable<ArrayList<Assessment>> getAll() {
+    @Override
+    public Observable<ArrayList<Assessment>> getAllAssessments() {
         return queryForSet(
                 queryBuilder()
                     .withId()
@@ -49,6 +40,7 @@ public class Assessments extends DatabaseDao<Assessment, AssessmentTable, Assess
         );
     }
 
+    @Override
     public Observable<Assessment> getAssessment(long assessmentId) {
         return queryForItem(assessmentId,
                 queryBuilder()
@@ -76,15 +68,16 @@ public class Assessments extends DatabaseDao<Assessment, AssessmentTable, Assess
 
     @Override
     protected Query createQuery(AssessmentTable table, NsirDatabase database) {
-        return new Query(table, new CursorBuilder(mContext), database);
+        return new Query(table, new AssessmentCursorBuilder(mContext), database);
     }
 
     @Override
     protected Assessment buildObject(AssessmentCursor cursor) {
+        android.util.Log.d("NSIR", "Building single object");
         if (cursor.moveToFirst()) {
             return constructAssessment(cursor);
         } else {
-            return new Assessment(0L, 0L, 0L, 0L, 0L, 0L, 0L);
+            return null;
         }
     }
 
@@ -111,11 +104,11 @@ public class Assessments extends DatabaseDao<Assessment, AssessmentTable, Assess
                 cursor.get51To100Results());
     }
 
-    private static class CursorBuilder implements DatabaseDao.CursorBuilder<AssessmentCursor> {
+    private static class AssessmentCursorBuilder implements DatabaseDao.CursorBuilder<AssessmentCursor> {
 
         private Context mContext;
 
-        public CursorBuilder(Context context) {
+        public AssessmentCursorBuilder(Context context) {
             mContext = context;
         }
 
@@ -129,7 +122,7 @@ public class Assessments extends DatabaseDao<Assessment, AssessmentTable, Assess
 
         private AssessmentTable mTable;
 
-        public Query(AssessmentTable table, CursorBuilder cursorBuilder, NsirDatabase database) {
+        public Query(AssessmentTable table, AssessmentCursorBuilder cursorBuilder, NsirDatabase database) {
             super(table, cursorBuilder, database);
 
             mTable = table;

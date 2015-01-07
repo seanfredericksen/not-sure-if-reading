@@ -41,4 +41,8 @@ public class ApplicationModule {
         return mApplication;
     }
 
+    @Provides @ForApplication Context provideContext(Application application) {
+        return application;
+    }
+
 }

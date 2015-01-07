@@ -13,7 +13,7 @@ import com.frederis.notsureifreading.actionbar.DrawerPresenter;
 import com.frederis.notsureifreading.actionbar.ToolbarOwner;
 import com.frederis.notsureifreading.animation.Transition;
 import com.frederis.notsureifreading.model.Assessment;
-import com.frederis.notsureifreading.model.Assessments;
+import com.frederis.notsureifreading.model.AssessmentModel;
 import com.frederis.notsureifreading.model.RecentAssessment;
 import com.frederis.notsureifreading.model.Student;
 import com.frederis.notsureifreading.model.StudentPopupInfo;
@@ -53,8 +53,8 @@ public class RecentAssessmentListScreen extends TransitionScreen implements Blue
     static class Module {
 
         @Provides
-        Observable<ArrayList<Assessment>> provideAssessments(Assessments assessments) {
-            return assessments.getAll();
+        Observable<ArrayList<Assessment>> provideAssessments(AssessmentModel assessments) {
+            return assessments.getAllAssessments();
         }
 
         @Provides
