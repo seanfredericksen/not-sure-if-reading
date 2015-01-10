@@ -6,7 +6,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -20,6 +23,9 @@ import android.view.MenuItem;
 
 import com.frederis.notsureifreading.actionbar.DrawerPresenter;
 import com.frederis.notsureifreading.actionbar.ToolbarOwner;
+import com.frederis.notsureifreading.database.Ideas.Assessments;
+import com.frederis.notsureifreading.database.Ideas.DatabaseAdapter;
+import com.frederis.notsureifreading.database.Ideas.DatabaseOpenHelper;
 import com.frederis.notsureifreading.presenter.ActivityResultPresenter;
 import com.frederis.notsureifreading.view.CoreView;
 
@@ -172,6 +178,25 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
             actionBarMenuActions = action;
             invalidateOptionsMenu();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        long start = SystemClock.elapsedRealtime();
+        DatabaseAdapter adapter = new DatabaseAdapter();
+
+        SQLiteOpenHelper helper = adapter.createDatabaseOpenHelper(this, "mydb", 1, Assessments.class);
+        long created = SystemClock.elapsedRealtime();
+        SQLiteDatabase database = helper.getWritableDatabase();
+        long init = SystemClock.elapsedRealtime();
+
+        Log.d("NSIR", "Creating: " + (created - start) + "ms");
+        Log.d("NSIR", "Initting: " + (init - created) + "ms");
+
+        Assessments.Model assessmentModel = adapter.createModel(Assessments.Model.class);
+        assessmentModel.getAllAssessments();
     }
 
     @Override

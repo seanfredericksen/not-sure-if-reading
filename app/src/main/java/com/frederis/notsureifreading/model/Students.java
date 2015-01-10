@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.frederis.notsureifreading.ForApplication;
+import com.frederis.notsureifreading.database.Ideas.DatabaseTable;
 import com.frederis.notsureifreading.database.NsirDatabase;
 import com.frederis.notsureifreading.database.cursor.StudentCursor;
 import com.frederis.notsureifreading.database.table.StudentTable;
@@ -22,6 +23,7 @@ import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
+@DatabaseTable(name = "student")
 public class Students {
 
     private Context mContext;

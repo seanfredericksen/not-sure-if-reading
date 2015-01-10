@@ -5,6 +5,7 @@ import android.content.Context;
 
 import com.frederis.notsureifreading.ForApplication;
 import com.frederis.notsureifreading.R;
+import com.frederis.notsureifreading.database.Ideas.DatabaseTable;
 import com.frederis.notsureifreading.database.NsirDatabase;
 import com.frederis.notsureifreading.database.cursor.WordCursor;
 import com.frederis.notsureifreading.database.table.StudentTable;
@@ -24,7 +25,7 @@ import rx.Subscriber;
 import rx.functions.Func1;
 import rx.subjects.BehaviorSubject;
 
-@Singleton
+@Singleton @DatabaseTable(name = "word")
 public class Words {
 
     private Context mContext;

@@ -3,7 +3,6 @@ package com.frederis.notsureifreading.model;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.util.*;
 
 import com.frederis.notsureifreading.database.DatabaseDao;
 import com.frederis.notsureifreading.database.NsirDatabase;
@@ -73,7 +72,6 @@ public class AssessmentModelImpl extends DatabaseDao<Assessment, AssessmentTable
 
     @Override
     protected Assessment buildObject(AssessmentCursor cursor) {
-        android.util.Log.d("NSIR", "Building single object");
         if (cursor.moveToFirst()) {
             return constructAssessment(cursor);
         } else {
