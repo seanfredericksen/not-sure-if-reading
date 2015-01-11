@@ -29,6 +29,7 @@ import com.frederis.notsureifreading.database.Ideas.DatabaseOpenHelper;
 import com.frederis.notsureifreading.presenter.ActivityResultPresenter;
 import com.frederis.notsureifreading.view.CoreView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -38,6 +39,9 @@ import mortar.Mortar;
 import mortar.MortarActivityScope;
 import mortar.MortarScope;
 import mortar.MortarScopeDevHelper;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import timber.log.Timber;
 
 import static android.content.Intent.ACTION_MAIN;
@@ -195,8 +199,19 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
         Log.d("NSIR", "Creating: " + (created - start) + "ms");
         Log.d("NSIR", "Initting: " + (init - created) + "ms");
 
-        Assessments.Model assessmentModel = adapter.createModel(Assessments.Model.class);
-        assessmentModel.getAllAssessments();
+        long model = SystemClock.elapsedRealtime();
+        final Assessments.Model assessmentModel = adapter.createModel(helper, Assessments.class, Assessments.Assessment.class, Assessments.Model.class);
+        Observable<ArrayList<Assessments.Assessment>> assessments = assessmentModel.getAllAssessments();
+        long modelDone = SystemClock.elapsedRealtime();
+
+        assessments.observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<ArrayList<Assessments.Assessment>>() {
+            @Override
+            public void call(ArrayList<Assessments.Assessment> assessments) {
+                Log.d("NSIR", "Got assessments: " + assessments.size());
+            }
+        });
+
+        Log.d("NSIR", "Model: " + (modelDone - model) + "ms");
     }
 
     @Override
