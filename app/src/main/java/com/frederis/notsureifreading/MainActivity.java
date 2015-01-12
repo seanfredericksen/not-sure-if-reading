@@ -26,6 +26,9 @@ import com.frederis.notsureifreading.actionbar.ToolbarOwner;
 import com.frederis.notsureifreading.database.Ideas.Assessments;
 import com.frederis.notsureifreading.database.Ideas.DatabaseAdapter;
 import com.frederis.notsureifreading.database.Ideas.DatabaseOpenHelper;
+import com.frederis.notsureifreading.database.Ideas.Logs;
+import com.frederis.notsureifreading.database.Ideas.Students;
+import com.frederis.notsureifreading.database.Ideas.Words;
 import com.frederis.notsureifreading.presenter.ActivityResultPresenter;
 import com.frederis.notsureifreading.view.CoreView;
 
@@ -192,7 +195,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
         long start = SystemClock.elapsedRealtime();
         DatabaseAdapter adapter = new DatabaseAdapter();
 
-        SQLiteOpenHelper helper = adapter.createDatabaseOpenHelper(this, "mydb", 1, Assessments.class);
+        SQLiteOpenHelper helper = adapter.createDatabaseOpenHelper(this, "mydb", 1, Assessments.class, Students.class, Words.class, Logs.class);
         long created = SystemClock.elapsedRealtime();
         SQLiteDatabase database = helper.getWritableDatabase();
         long init = SystemClock.elapsedRealtime();
@@ -202,6 +205,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
 
         long model = SystemClock.elapsedRealtime();
         final Assessments.Model assessmentModel = adapter.createModel(helper, Assessments.class, Assessments.Assessment.class, Assessments.Model.class);
+        final Students.Model studentModel = adapter.createModel(helper, Students.class, Students.Student.class, Students.Model.class);
 
 //        assessmentModel.updateOrInsert(new Assessments.Assessment() {
 //            @Override
@@ -220,8 +224,18 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
 //            }
 //
 //            @Override
-//            public String getFoo() {
-//                return "SUPERFOO";
+//            public long getEndingWord() {
+//                return 2L;
+//            }
+//
+//            @Override
+//            public long getOneToFiftyResults() {
+//                return 2L;
+//            }
+//
+//            @Override
+//            public long getFiftyOneToOneHundredResults() {
+//                return 1L;
 //            }
 //
 //            @Override
@@ -229,6 +243,35 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
 //                return 0L;
 //            }
 //        });
+
+        studentModel.updateOrInsert(new Students.Student() {
+            @Override
+            public String getName() {
+                return "Chris Hoekstra";
+            }
+
+            @Override
+            public String getImageUri() {
+                return null;
+            }
+
+            @Override
+            public long getStartingWord() {
+                return 1L;
+            }
+
+            @Override
+            public long getEndingWord() {
+                return 2L;
+            }
+
+            @Override
+            public long getId() {
+                return 0L;
+            }
+        });
+
+
 
         SystemClock.sleep(1000);
 
@@ -253,6 +296,14 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
             @Override
             public void call(Assessments.Assessment assessment) {
                 Log.d("NSIR", "Val: " + assessment.getId() + ", " + assessment.getStudentId());
+            }
+        });
+
+        Observable<Students.Student> studentObservable = studentModel.getStudent(1L);
+        studentObservable.observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Students.Student>() {
+            @Override
+            public void call(Students.Student student) {
+                Log.d("NSIR", "Student: " + student.getId() + ", " + student.getName());
             }
         });
     }

@@ -1,8 +1,5 @@
 package com.frederis.notsureifreading.database.Ideas;
 
-import com.frederis.notsureifreading.model.Students;
-import com.frederis.notsureifreading.model.Words;
-
 import java.util.ArrayList;
 
 import rx.Observable;
@@ -19,24 +16,42 @@ public class Assessments {
     @ForeignIdColumn(foreignTable = Words.class, foreignColumn = DatabaseTable.ID)
     public static final String STARTING_WORD = "startingWord";
 
-    @TextColumn
-    public static final String FOO = "foo";
+    @ForeignIdColumn(foreignTable = Words.class, foreignColumn = DatabaseTable.ID)
+    public static final String ENDING_WORD = "endingWord";
+
+    @IntColumn
+    public static final String ONE_TO_FIFTY_RESULTS = "oneToFiftyResults";
+
+    @IntColumn
+    public static final String FIFTY_ONE_TO_ONE_HUNDRED_RESULTS = "fiftyOneToOneHundredResults";
 
     public interface Assessment extends DatabaseObject {
         @ColumnLink(STUDENT) long getStudentId();
         @ColumnLink(DATE) long getDate();
         @ColumnLink(STARTING_WORD) long getStartingWord();
-        @ColumnLink(FOO) String getFoo();
+        @ColumnLink(ENDING_WORD) long getEndingWord();
+        @ColumnLink(ONE_TO_FIFTY_RESULTS) long getOneToFiftyResults();
+        @ColumnLink(FIFTY_ONE_TO_ONE_HUNDRED_RESULTS) long getFiftyOneToOneHundredResults();
     }
 
     public interface Model {
         @MultipleItemRetriever
-        @Columns({DatabaseTable.ID, STUDENT, DATE, STARTING_WORD})
+        @Columns({DatabaseTable.ID,
+                  STUDENT,
+                  DATE,
+                  STARTING_WORD,
+                  ENDING_WORD})
         @SortDesc(DATE)
         Observable<ArrayList<Assessment>> getAllAssessments();
 
         @SingleItemRetriever
-        @Columns({DatabaseTable.ID, STUDENT, DATE, FOO})
+        @Columns({DatabaseTable.ID,
+                  STUDENT,
+                  DATE,
+                  STARTING_WORD,
+                  ENDING_WORD,
+                  ONE_TO_FIFTY_RESULTS,
+                  FIFTY_ONE_TO_ONE_HUNDRED_RESULTS})
         @Select(DatabaseTable.ID + " = ?")
         Observable<Assessment> getAssessment(@SelectArg long assessmentId);
 

@@ -841,7 +841,7 @@ public class DatabaseAdapter {
         }
 
         public String getIndexString(String tableName) {
-            return String.format("%s_index ON %s(%s)", mName, tableName, mName);
+            return String.format("%s_%s_index ON %s(%s)", tableName, mName, tableName, mName);
         }
 
         abstract String getCreationString();
