@@ -241,7 +241,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
                 Log.d("NSIR", "Got assessments: " + assessments.size());
 
                 for (Assessments.Assessment assessment : assessments) {
-                    Log.d("NSIR", "Val: " + assessment.getId() + ", " + assessment.getFoo());
+                    Log.d("NSIR", "Val: " + assessment.getId() + ", " + assessment.getStudentId());
                 }
             }
         });

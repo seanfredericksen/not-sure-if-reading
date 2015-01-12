@@ -118,7 +118,11 @@ public class DatabaseAdapter {
 
             final ObjectMethodInfo info = getObjectMethodInfo(objectMethodDetailsCache, method);
 
-            return objectReturnValues.get(info.getColumnLinkKey());
+            if (objectReturnValues.containsKey(info.getColumnLinkKey())) {
+                return objectReturnValues.get(info.getColumnLinkKey());
+            }
+
+            throw new IllegalAccessError("Invoked method: " + method + " but linked column was not included in query");
         }
     }
 
@@ -352,10 +356,13 @@ public class DatabaseAdapter {
                 if (columnLink != null) {
                     Class<?> returnClass = method.getReturnType();
 
-                    if (returnClass == long.class) {
-                        values.put(columnLink.value(), cursor.getLong(cursor.getColumnIndex(columnLink.value())));
-                    } else if (returnClass == String.class) {
-                        values.put(columnLink.value(), cursor.getString(cursor.getColumnIndex(columnLink.value())));
+                    int columnIndex = cursor.getColumnIndex(columnLink.value());
+                    if (columnIndex >= 0) {
+                        if (returnClass == long.class) {
+                            values.put(columnLink.value(), cursor.getLong(cursor.getColumnIndex(columnLink.value())));
+                        } else if (returnClass == String.class) {
+                            values.put(columnLink.value(), cursor.getString(cursor.getColumnIndex(columnLink.value())));
+                        }
                     }
                 }
             }
