@@ -31,7 +31,7 @@ public class Assessments {
 
     public interface Model {
         @MultipleItemRetriever
-        @Columns({DatabaseTable.ID, STUDENT, DATE, STARTING_WORD})
+        @Columns({DatabaseTable.ID, STUDENT, DATE, STARTING_WORD, FOO})
         @SortDesc(DATE)
         Observable<ArrayList<Assessment>> getAllAssessments();
 

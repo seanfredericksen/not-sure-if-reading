@@ -1,14 +1,17 @@
 package com.frederis.notsureifreading.database.Ideas;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.CursorWrapper;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
@@ -92,11 +95,11 @@ public class DatabaseAdapter {
     }
 
     @SuppressWarnings("unchecked")
-    public <E, O, T> T createModel(SQLiteOpenHelper helper, Class<E> table, Class<O> object, Class<T> model) {
+    public <E, O extends DatabaseObject, T> T createModel(SQLiteOpenHelper helper, Class<E> table, Class<O> object, Class<T> model) {
         return (T) Proxy.newProxyInstance(model.getClassLoader(), new Class<?>[]{model}, new ModelFieldHandler<>(helper, table, object, getMethodInfoCache(model)));
     }
 
-    private class ObjectResultHandler<O> implements InvocationHandler {
+    private class ObjectResultHandler implements InvocationHandler {
 
         private final Map<String, Object> objectReturnValues;
         private final Map<Method, ObjectMethodInfo> objectMethodDetailsCache;
@@ -119,7 +122,7 @@ public class DatabaseAdapter {
         }
     }
 
-    private class ModelFieldHandler<E, O> implements InvocationHandler {
+    private class ModelFieldHandler<E, O extends DatabaseObject> implements InvocationHandler {
 
         private SQLiteOpenHelper mHelper;
         private final Class<E> tableClass;
@@ -138,6 +141,7 @@ public class DatabaseAdapter {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             if (method.getDeclaringClass() == Object.class) {
                 return method.invoke(this, args);
@@ -151,10 +155,88 @@ public class DatabaseAdapter {
                 case SINGLE_RETRIEVER:
                     break;
                 case UPDATER:
-                    break;
+                    Log.d("NSIR", "Inserting assessment");
+                    updateOrInsert((O) args[0]);
+                    return null;
             }
 
             return null;
+        }
+
+        public void updateOrInsert(O value) {
+            updateOrInsert(Observable.just(value)
+                    .observeOn(Schedulers.io())
+                    .subscribeOn(Schedulers.io()));
+        }
+
+        private void updateOrInsert(Observable<O> value) {
+            value.subscribe(new Action1<O>() {
+                @Override
+                public void call(O object) {
+                    Log.d("NSIR", "Inserting or updating!");
+                    long id = (object.getId() == 0L)
+                            ? insert(buildValues(object))
+                            : update(object.getId(), buildValues(object));
+
+                    notifyOfUpdates(id);
+                }
+            });
+        }
+
+        private ContentValues buildValues(O object) {
+            Log.d("NSIR", "Building values");
+            Map<Method, ObjectMethodInfo> methodCache = getObjectMethodInfoCache(objectClass);
+
+            ContentValues values = new ContentValues();
+
+            for (Method method : objectClass.getDeclaredMethods()) {
+                ColumnLink columnLink = method.getAnnotation(ColumnLink.class);
+                if (columnLink != null) {
+                    ObjectMethodInfo info = getObjectMethodInfo(methodCache, method);
+                    Class<?> returnClass = method.getReturnType();
+
+                    Log.d("NSIR", "Attempting to put value");
+
+                    try {
+                        if (returnClass == long.class) {
+                            values.put(info.getColumnLinkKey(), (Long) method.invoke(object));
+                        } else if (returnClass == String.class) {
+                            values.put(info.getColumnLinkKey(), (String) method.invoke(object));
+                        }
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                        throw new IllegalAccessError("Illegal access of method: " + method);
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                        throw new RuntimeException("Error invoking method: " + method);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+
+            Log.d("NSIR", "Returing values");
+
+            return values;
+        }
+
+        private void notifyOfUpdates(long id) {
+            Log.d("NSIR", "notify of updates");
+            mUpdater.onNext(id);
+        }
+
+        private long insert(ContentValues values) {
+            Log.d("NSIR", "Inserting values");
+            return mHelper.getWritableDatabase().insert(getTableName(), null, values);
+        }
+
+        private long update(long id, ContentValues values) {
+            Log.d("NSIR", "Updating values");
+            return mHelper.getWritableDatabase().update(getTableName(),
+                    values,
+                    DatabaseTable.ID + " = ?",
+                    new String[]{Long.toString(id)});
         }
 
         private Observable<ArrayList<O>> getMultiRetrieverObservable(final Object[] args, final ModelMethodInfo info) {
@@ -257,13 +339,30 @@ public class DatabaseAdapter {
 
         @SuppressWarnings("unchecked")
         private O constructObject(Cursor cursor) {
-            return (O) Proxy.newProxyInstance(objectClass.getClassLoader(), new Class<?>[]{objectClass}, new ObjectResultHandler<O>(extractCursorValues(cursor), getObjectMethodInfoCache(objectClass)));
+            return (O) Proxy.newProxyInstance(objectClass.getClassLoader(), new Class<?>[]{objectClass}, new ObjectResultHandler(extractCursorValues(cursor), getObjectMethodInfoCache(objectClass)));
         }
 
         private Map<String, Object> extractCursorValues(Cursor cursor) {
             Map<String, Object> values = new LinkedHashMap<>();
 
             for (Method method : objectClass.getDeclaredMethods()) {
+                Log.d("NSIR", "Extracting wtih method: " + method);
+
+                ColumnLink columnLink = method.getAnnotation(ColumnLink.class);
+                if (columnLink != null) {
+                    Class<?> returnClass = method.getReturnType();
+
+                    if (returnClass == long.class) {
+                        values.put(columnLink.value(), cursor.getLong(cursor.getColumnIndex(columnLink.value())));
+                    } else if (returnClass == String.class) {
+                        values.put(columnLink.value(), cursor.getString(cursor.getColumnIndex(columnLink.value())));
+                    }
+                }
+            }
+
+            for (Method method : DatabaseObject.class.getDeclaredMethods()) {
+                Log.d("NSIR", "Extracting wtih method: " + method);
+
                 ColumnLink columnLink = method.getAnnotation(ColumnLink.class);
                 if (columnLink != null) {
                     Class<?> returnClass = method.getReturnType();
@@ -435,9 +534,7 @@ public class DatabaseAdapter {
 
             Class<?>[] parameters = mMethod.getParameterTypes();
 
-            if (mType.equals(ModelMethodType.UPDATER)) {
-                //TODO - Make sure its one length and matches objectClass
-            } else {
+            if (!mType.equals(ModelMethodType.UPDATER)) {
                 mSelectArgHandlers = new ArrayList<>();
                 Annotation[][] methodParameterAnnotationArrays = mMethod.getParameterAnnotations();
 
@@ -501,6 +598,18 @@ public class DatabaseAdapter {
                 } catch (Exception e) {
                     throw new IllegalStateException("Method annotated with MultipleItemRetriever must have correct return type");
                 }
+            } else if (singleItemRetriever != null) {
+
+            } else if (itemUpdater != null) {
+                Class<?>[] parameterTypes = mMethod.getParameterTypes();
+                if (parameterTypes.length != 1) {
+                    throw new IllegalStateException("Item update model method must have a single parameter");
+                }
+
+                mObjectClass = parameterTypes[0];
+                mType = ModelMethodType.UPDATER;
+            } else {
+                throw new IllegalStateException("Model method not a valid type");
             }
         }
 

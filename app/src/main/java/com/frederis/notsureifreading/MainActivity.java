@@ -30,6 +30,7 @@ import com.frederis.notsureifreading.presenter.ActivityResultPresenter;
 import com.frederis.notsureifreading.view.CoreView;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -201,6 +202,36 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
 
         long model = SystemClock.elapsedRealtime();
         final Assessments.Model assessmentModel = adapter.createModel(helper, Assessments.class, Assessments.Assessment.class, Assessments.Model.class);
+
+//        assessmentModel.updateOrInsert(new Assessments.Assessment() {
+//            @Override
+//            public long getStudentId() {
+//                return 1L;
+//            }
+//
+//            @Override
+//            public long getDate() {
+//                return new Date().getTime();
+//            }
+//
+//            @Override
+//            public long getStartingWord() {
+//                return 1L;
+//            }
+//
+//            @Override
+//            public String getFoo() {
+//                return "SUPERFOO";
+//            }
+//
+//            @Override
+//            public long getId() {
+//                return 0L;
+//            }
+//        });
+
+        SystemClock.sleep(1000);
+
         Observable<ArrayList<Assessments.Assessment>> assessments = assessmentModel.getAllAssessments();
         long modelDone = SystemClock.elapsedRealtime();
 
@@ -208,6 +239,10 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
             @Override
             public void call(ArrayList<Assessments.Assessment> assessments) {
                 Log.d("NSIR", "Got assessments: " + assessments.size());
+
+                for (Assessments.Assessment assessment : assessments) {
+                    Log.d("NSIR", "Val: " + assessment.getId() + ", " + assessment.getFoo());
+                }
             }
         });
 
