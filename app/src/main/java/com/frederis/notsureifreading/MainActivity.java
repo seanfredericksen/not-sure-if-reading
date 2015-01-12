@@ -232,21 +232,29 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
 
         SystemClock.sleep(1000);
 
-        Observable<ArrayList<Assessments.Assessment>> assessments = assessmentModel.getAllAssessments();
+//        Observable<ArrayList<Assessments.Assessment>> assessments = assessmentModel.getAllAssessments();
         long modelDone = SystemClock.elapsedRealtime();
 
-        assessments.observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<ArrayList<Assessments.Assessment>>() {
-            @Override
-            public void call(ArrayList<Assessments.Assessment> assessments) {
-                Log.d("NSIR", "Got assessments: " + assessments.size());
-
-                for (Assessments.Assessment assessment : assessments) {
-                    Log.d("NSIR", "Val: " + assessment.getId() + ", " + assessment.getStudentId());
-                }
-            }
-        });
+//        assessments.observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<ArrayList<Assessments.Assessment>>() {
+//            @Override
+//            public void call(ArrayList<Assessments.Assessment> assessments) {
+//                Log.d("NSIR", "Got assessments: " + assessments.size());
+//
+//                for (Assessments.Assessment assessment : assessments) {
+//                    Log.d("NSIR", "Val: " + assessment.getId() + ", " + assessment.getStudentId());
+//                }
+//            }
+//        });
 
         Log.d("NSIR", "Model: " + (modelDone - model) + "ms");
+
+        Observable<Assessments.Assessment> assessmentObservable = assessmentModel.getAssessment(1L);
+        assessmentObservable.observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Assessments.Assessment>() {
+            @Override
+            public void call(Assessments.Assessment assessment) {
+                Log.d("NSIR", "Val: " + assessment.getId() + ", " + assessment.getStudentId());
+            }
+        });
     }
 
     @Override

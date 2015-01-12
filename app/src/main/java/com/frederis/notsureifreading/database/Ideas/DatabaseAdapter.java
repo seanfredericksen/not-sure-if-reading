@@ -8,6 +8,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.frederis.notsureifreading.database.cursor.AssessmentCursor;
+import com.frederis.notsureifreading.model.Assessment;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
@@ -157,7 +160,7 @@ public class DatabaseAdapter {
                 case MULTI_RETRIEVER:
                     return getMultiRetrieverObservable(args, methodInfo);
                 case SINGLE_RETRIEVER:
-                    break;
+                    return getSingleRetrieverObservable(args, methodInfo);
                 case UPDATER:
                     Log.d("NSIR", "Inserting assessment");
                     updateOrInsert((O) args[0]);
@@ -259,6 +262,23 @@ public class DatabaseAdapter {
             }).subscribeOn(Schedulers.io());
         }
 
+        private Observable<O> getSingleRetrieverObservable(final Object[] args, final ModelMethodInfo info) {
+            return Observable.create(new Observable.OnSubscribe<O>() {
+                @Override
+                public void call(final Subscriber<? super O> subscriber) {
+                    info.init();
+
+                    queryForItem((Long) args[0], buildQuery(args, info)).subscribe(new Action1<O>() {
+                        @Override
+                        public void call(O os) {
+                            subscriber.onNext(os);
+                        }
+                    });
+                }
+            }).subscribeOn(Schedulers.io());
+        }
+
+
         @SuppressWarnings("unchecked")
         private Query buildQuery(final Object[] args, final ModelMethodInfo info) {
             Query query = new Query(getTableName(), mHelper);
@@ -312,6 +332,41 @@ public class DatabaseAdapter {
             }).asObservable();
         }
 
+        protected Observable<O> queryForItem(final long itemId, final Query query) {
+            BehaviorSubject<O> subject = BehaviorSubject.create();
+
+            buildSingleItemObservable(query).subscribe(subject);
+            mUpdater.filter(new Func1<Long, Boolean>() {
+                @Override
+                public Boolean call(Long value) {
+                    return value == itemId;
+                }
+            }).flatMap(new Func1<Long, Observable<O>>() {
+                @Override
+                public Observable<O> call(Long aLong) {
+                    return buildSingleItemObservable(query);
+                }
+            }).subscribe(subject);
+
+            return subject.asObservable();
+        }
+
+
+        private Observable<O> buildSingleItemObservable(final Query query) {
+            return Observable.create(new Observable.OnSubscribe<O>() {
+                @Override
+                public void call(Subscriber<? super O> subscriber) {
+                    Cursor cursor = query.execute();
+
+                    O object = buildObject(cursor);
+
+                    cursor.close();
+
+                    subscriber.onNext(object);
+                }
+            }).observeOn(Schedulers.io()).subscribeOn(Schedulers.io());
+        }
+
         private Observable<ArrayList<O>> buildMultiItemObservable(final Query query) {
             return Observable.create(new Observable.OnSubscribe<ArrayList<O>>() {
                                          @Override
@@ -339,6 +394,14 @@ public class DatabaseAdapter {
             }
 
             return results;
+        }
+
+        private O buildObject(Cursor cursor) {
+            if (cursor.moveToFirst()) {
+                return constructObject(cursor);
+            } else {
+                return null;
+            }
         }
 
         @SuppressWarnings("unchecked")
@@ -544,6 +607,8 @@ public class DatabaseAdapter {
             if (!mType.equals(ModelMethodType.UPDATER)) {
                 mSelectArgHandlers = new ArrayList<>();
                 Annotation[][] methodParameterAnnotationArrays = mMethod.getParameterAnnotations();
+                Log.d("NSIR", "Checking method: " + mMethod);
+                Log.d("NSIR", "Method parameter annotations: " + methodParameterAnnotationArrays[0].length);
 
                 for (int i = 0; i < methodParameterAnnotationArrays.length; i++) {
                     Annotation[] methodParameterAnnotations = methodParameterAnnotationArrays[i];
@@ -551,6 +616,7 @@ public class DatabaseAdapter {
                     boolean foundSelectArg = false;
 
                     for (Annotation annotation : methodParameterAnnotations) {
+                        Log.d("NSIR", "method param annotation: " + annotation);
                         if (annotation.annotationType() == SelectArg.class) {
                             foundSelectArg = true;
                         }
@@ -606,7 +672,16 @@ public class DatabaseAdapter {
                     throw new IllegalStateException("Method annotated with MultipleItemRetriever must have correct return type");
                 }
             } else if (singleItemRetriever != null) {
+                if (itemUpdater != null) {
+                    throw new IllegalStateException("Cannot annotate single retriever method with other model annotations");
+                }
 
+                try {
+                    mObjectClass = (Class) getGenericReturnArg();
+                    mType = ModelMethodType.SINGLE_RETRIEVER;
+                } catch (Exception e) {
+                    throw new IllegalStateException("Method annotated with SingleItemRetriever must have correct return type");
+                }
             } else if (itemUpdater != null) {
                 Class<?>[] parameterTypes = mMethod.getParameterTypes();
                 if (parameterTypes.length != 1) {
