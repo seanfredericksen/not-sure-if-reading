@@ -1,12 +1,13 @@
 package com.frederis.notsureifreading.util;
 
-import com.frederis.notsureifreading.model.Assessment;
 import com.frederis.notsureifreading.model.RecentAssessment;
 import com.frederis.notsureifreading.model.Students;
 
 import javax.inject.Inject;
 
 import rx.functions.Func1;
+
+import static com.frederis.notsureifreading.database.Ideas.Assessments.Assessment;
 
 public class RecentAssessmentCreator implements Func1<Assessment, RecentAssessment> {
 
@@ -31,8 +32,8 @@ public class RecentAssessmentCreator implements Func1<Assessment, RecentAssessme
         for (int i = 0; i < total; i++) {
             long result =
                     (i < 50
-                            ? assessment.getOneToFiftyResult()
-                            : assessment.getFiftyOneToOneHundredResult()
+                            ? assessment.getOneToFiftyResults()
+                            : assessment.getFiftyOneToOneHundredResults()
                     ) & (1L << (i < 50 ? (49 - i) : (99 - i)));
 
             if (result != 0L) {

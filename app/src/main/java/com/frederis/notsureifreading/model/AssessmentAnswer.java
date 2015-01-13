@@ -1,5 +1,7 @@
 package com.frederis.notsureifreading.model;
 
+import com.frederis.notsureifreading.database.Ideas.Words.Word;
+
 public class AssessmentAnswer {
 
     private Word mWord;

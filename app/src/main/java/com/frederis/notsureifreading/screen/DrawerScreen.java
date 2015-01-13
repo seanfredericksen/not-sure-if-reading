@@ -43,7 +43,7 @@ public class DrawerScreen implements Blueprint {
     public static class Module {
 
         @Provides
-        Observable<ArrayList<NavigationDrawerItem>> provideAssessments(NavigationDrawer drawer) {
+        Observable<ArrayList<NavigationDrawerItem>> provideDrawer(NavigationDrawer drawer) {
             return drawer.getItems();
         }
 

@@ -9,13 +9,10 @@ import com.frederis.notsureifreading.MainScope;
 import com.frederis.notsureifreading.R;
 import com.frederis.notsureifreading.actionbar.ToolbarOwner;
 import com.frederis.notsureifreading.animation.Transition;
-import com.frederis.notsureifreading.model.Assessment;
+import com.frederis.notsureifreading.database.Ideas.Assessments;
+import com.frederis.notsureifreading.database.Ideas.Words;
 import com.frederis.notsureifreading.model.AssessmentAnswer;
-import com.frederis.notsureifreading.model.AssessmentModel;
-import com.frederis.notsureifreading.model.AssessmentModelImpl;
 import com.frederis.notsureifreading.model.RecentAssessment;
-import com.frederis.notsureifreading.model.Word;
-import com.frederis.notsureifreading.model.Words;
 import com.frederis.notsureifreading.util.RecentAssessmentCreator;
 import com.frederis.notsureifreading.view.AssessmentView;
 
@@ -37,6 +34,8 @@ import rx.functions.Func1;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.Subject;
 import rx.subscriptions.Subscriptions;
+
+import static com.frederis.notsureifreading.database.Ideas.Assessments.Assessment;
 
 @Layout(R.layout.assessment_view)
 @Transition({R.animator.slide_in_right, R.animator.slide_out_left, R.animator.slide_in_left, R.animator.slide_out_right})
@@ -64,14 +63,14 @@ public class AssessmentScreen implements HasParent<RecentAssessmentListScreen>, 
     public class Module {
 
         @Provides
-        Observable<Assessment> provideAssessment(AssessmentModel assessments) {
+        Observable<Assessment> provideAssessment(Assessments.Model assessments) {
             return assessments.getAssessment(mAssessmentId);
         }
 
         @Provides
         Presenter providePresenter(Observable<Assessment> assessment,
                                    RecentAssessmentCreator recentAssessmentsCreator,
-                                   Words words,
+                                   Words.Model words,
                                    @ForApplication Context context,
                                    @MainScope Flow flow,
                                    ToolbarOwner toolbarOwner) {
@@ -86,7 +85,7 @@ public class AssessmentScreen implements HasParent<RecentAssessmentListScreen>, 
         private final long mAssessmentId;
         private final Observable<Assessment> mAssessment;
         private final RecentAssessmentCreator mRecentAssessmentCreator;
-        private final Words mWords;
+        private final Words.Model mWords;
         private final Flow mFlow;
         private final ToolbarOwner mToolbarOwner;
         private final Context mContext;
@@ -104,7 +103,7 @@ public class AssessmentScreen implements HasParent<RecentAssessmentListScreen>, 
                          Context context,
                          Observable<Assessment> assessment,
                          RecentAssessmentCreator recentAssessmentCreator,
-                         Words words,
+                         Words.Model words,
                          Flow flow,
                          ToolbarOwner toolbarOwner) {
             mAssessmentId = assessmentId;
@@ -153,23 +152,27 @@ public class AssessmentScreen implements HasParent<RecentAssessmentListScreen>, 
         }
 
         private Observable<ArrayList<AssessmentAnswer>> createAssessmentAnswersObservable() {
-            return mAssessment.map(new Func1<Assessment, ArrayList<AssessmentAnswer>>() {
+            return mAssessment.flatMap(new Func1<Assessment, Observable<ArrayList<AssessmentAnswer>>>() {
                 @Override
-                public ArrayList<AssessmentAnswer> call(Assessment assessment) {
-                    ArrayList<Word> words = mWords.getAssessmentWords(assessment);
-                    ArrayList<AssessmentAnswer> answers = new ArrayList<>(words.size());
+                public Observable<ArrayList<AssessmentAnswer>> call(final Assessment assessment) {
+                    return mWords.getWordSet(assessment.getStartingWord(), assessment.getEndingWord()).map(new Func1<ArrayList<Words.Word>, ArrayList<AssessmentAnswer>>() {
+                        @Override
+                        public ArrayList<AssessmentAnswer> call(ArrayList<Words.Word> words) {
+                            ArrayList<AssessmentAnswer> answers = new ArrayList<>(words.size());
 
-                    for (int i = 0; i < words.size(); i++) {
-                        long result =
-                                (i < 50
-                                        ? assessment.getOneToFiftyResult()
-                                        : assessment.getFiftyOneToOneHundredResult()
-                                ) & (1L << (i < 50 ? (49 - i) : (99 - i)));
+                            for (int i = 0; i < words.size(); i++) {
+                                long result =
+                                        (i < 50
+                                                ? assessment.getOneToFiftyResults()
+                                                : assessment.getFiftyOneToOneHundredResults()
+                                        ) & (1L << (i < 50 ? (49 - i) : (99 - i)));
 
-                        answers.add(new AssessmentAnswer(words.get(i), result != 0L));
-                    }
+                                answers.add(new AssessmentAnswer(words.get(i), result != 0L));
+                            }
 
-                    return answers;
+                            return answers;
+                        }
+                    });
                 }
             });
         }

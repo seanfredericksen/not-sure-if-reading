@@ -20,6 +20,8 @@ public class Students {
     public static final String ENDING_WORD = "endingWord";
 
     public interface Student extends DatabaseObject {
+        public static final String IMAGE_UNCHANGED = "imageUnchanged";
+
         @ColumnLink(NAME) String getName();
         @ColumnLink(IMAGE_URI) String getImageUri();
         @ColumnLink(STARTING_WORD) long getStartingWord();
@@ -37,6 +39,7 @@ public class Students {
         Observable<ArrayList<Student>> getStudents();
 
         @ItemUpdater
+        @IncludeColumnIf(column = IMAGE_URI, notValue = Student.IMAGE_UNCHANGED)
         void updateOrInsert(Student student);
     }
 

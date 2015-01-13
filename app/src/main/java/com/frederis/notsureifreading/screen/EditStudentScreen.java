@@ -16,10 +16,10 @@ import com.frederis.notsureifreading.TransitionScreen;
 import com.frederis.notsureifreading.actionbar.DrawerPresenter;
 import com.frederis.notsureifreading.actionbar.ToolbarOwner;
 import com.frederis.notsureifreading.animation.Transition;
-import com.frederis.notsureifreading.model.Log;
-import com.frederis.notsureifreading.model.Logs;
-import com.frederis.notsureifreading.model.Student;
-import com.frederis.notsureifreading.model.Students;
+import com.frederis.notsureifreading.database.Ideas.Logs;
+import com.frederis.notsureifreading.database.Ideas.Students;
+import com.frederis.notsureifreading.model.LogImpl;
+import com.frederis.notsureifreading.model.StudentImpl;
 import com.frederis.notsureifreading.presenter.ActivityResultPresenter;
 import com.frederis.notsureifreading.presenter.ActivityResultRegistrar;
 import com.frederis.notsureifreading.view.EditStudentView;
@@ -42,6 +42,8 @@ import rx.Observable;
 import rx.functions.Func1;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.Subject;
+
+import static com.frederis.notsureifreading.database.Ideas.Students.Student;
 
 @Layout(R.layout.edit_student_view)
 @Transition({R.animator.slide_in_right, R.animator.slide_out_left, R.animator.slide_in_left, R.animator.slide_out_right})
@@ -72,19 +74,19 @@ public class EditStudentScreen extends TransitionScreen implements HasParent<Stu
     public class Module {
 
         @Provides
-        Observable<Student> provideStudent(Students students) {
-            return students.getStudent(mStudentId);
+        Observable<Student> provideStudent(Students.Model studentModel) {
+            return studentModel.getStudent(mStudentId);
         }
 
         @Provides
-        Presenter providePresenter(Students students,
+        Presenter providePresenter(Students.Model students,
                                    Observable<Student> student,
                                    @MainScope Flow flow,
-                                   Logs logs,
+                                   Logs.Model logModel,
                                    DrawerPresenter drawerPresenter,
                                    ToolbarOwner actionBar,
                                    ActivityResultRegistrar activityResultRegistrar) {
-            return new Presenter(mStudentId, students, student, flow, logs, drawerPresenter, actionBar, activityResultRegistrar);
+            return new Presenter(mStudentId, students, student, flow, logModel, drawerPresenter, actionBar, activityResultRegistrar);
         }
 
     }
@@ -96,10 +98,10 @@ public class EditStudentScreen extends TransitionScreen implements HasParent<Stu
         private static final String KEY_IMAGE_CAPTURE_URI = "imageCaptureUri";
 
         private final long studentId;
-        private final Students students;
+        private final Students.Model studentModel;
         private final Observable<Student> student;
         private final Flow flow;
-        private final Logs logs;
+        private final Logs.Model logs;
         private final DrawerPresenter drawerPresenter;
         private final ToolbarOwner actionBar;
         private final ActivityResultRegistrar activityResultRegistrar;
@@ -112,15 +114,15 @@ public class EditStudentScreen extends TransitionScreen implements HasParent<Stu
         private final Subject<Uri, Uri> image = BehaviorSubject.create();
 
         public Presenter(long studentId,
-                         Students students,
+                         Students.Model studentModel,
                          Observable<Student> student,
                          Flow flow,
-                         Logs logs,
+                         Logs.Model logs,
                          DrawerPresenter drawerPresenter,
                          ToolbarOwner actionBar,
                          ActivityResultRegistrar activityResultRegistrar) {
             this.studentId = studentId;
-            this.students = students;
+            this.studentModel = studentModel;
             this.student = student;
             this.flow = flow;
             this.logs = logs;
@@ -173,7 +175,8 @@ public class EditStudentScreen extends TransitionScreen implements HasParent<Stu
                     .map(new Func1<Student, Uri>() {
                         @Override
                         public Uri call(Student student) {
-                            return student.getImageUri();
+                            String uriString = student.getImageUri();
+                            return uriString != null ? Uri.parse(uriString) : null;
                         }
                     });
         }
@@ -185,12 +188,16 @@ public class EditStudentScreen extends TransitionScreen implements HasParent<Stu
         public void updateOrInsertStudent(String name,
                                           long startingWord,
                                           long endingWord) {
-            students.updateOrInsertStudent(new Student(studentId, name, mImageCaptureUri != null ? mImageCaptureUri : Student.IMAGE_UNCHANGED, startingWord, endingWord));
+            studentModel.updateOrInsert(new StudentImpl(studentId,
+                    name,
+                    mImageCaptureUri != null ? mImageCaptureUri : Uri.parse(Student.IMAGE_UNCHANGED),
+                    startingWord,
+                    endingWord));
 
             if (studentId == 0L) {
-                logs.updateOrInsertLog(new Log("Added student " + name));
+                logs.updateOrInsert(new LogImpl("Added student " + name));
             } else {
-                logs.updateOrInsertLog(new Log("Updated student " + name + ", with words: " + startingWord + "-" + endingWord));
+                logs.updateOrInsert(new LogImpl("Updated student " + name + ", with words: " + startingWord + "-" + endingWord));
             }
         }
 
