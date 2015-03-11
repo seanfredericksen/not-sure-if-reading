@@ -1,6 +1,7 @@
 package com.frederis.notsureifreading.view;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
@@ -100,11 +101,14 @@ public class PerformAssessmentView extends FractionalViewPager
         private Context mContext;
         private LUtils mLUtils;
         private ArrayList<AssessmentAnswer> mWordAssessments;
+        private Typeface mTypeFace;
 
         public Adapter(Context context, ArrayList<AssessmentAnswer> wordAssessments) {
             mContext = context;
             mLUtils = new LUtils(context);
             mWordAssessments = wordAssessments;
+
+            mTypeFace = Typeface.createFromAsset(context.getAssets(), "fonts/ComingSoon.ttf");
         }
 
         @Override
@@ -129,6 +133,8 @@ public class PerformAssessmentView extends FractionalViewPager
 
         public View getView(Context context, ViewGroup container, AssessmentAnswer assessment) {
             View view = LayoutInflater.from(context).inflate(R.layout.perform_assessment_page_view, container, false);
+
+            ((TextView) view.findViewById(R.id.word_name)).setTypeface(mTypeFace);
 
             bindView(view, assessment);
 
