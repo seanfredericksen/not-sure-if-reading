@@ -1,6 +1,5 @@
 package com.frederis.notsureifreading;
 
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,15 +9,11 @@ import android.os.Bundle;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.frederis.notsureifreading.actionbar.DrawerPresenter;
 import com.frederis.notsureifreading.actionbar.ToolbarOwner;
 import com.frederis.notsureifreading.presenter.ActivityResultPresenter;
 import com.frederis.notsureifreading.view.CoreView;
@@ -31,22 +26,18 @@ import flow.Flow;
 import mortar.Mortar;
 import mortar.MortarActivityScope;
 import mortar.MortarScope;
-import mortar.MortarScopeDevHelper;
 import timber.log.Timber;
 
 import static android.content.Intent.ACTION_MAIN;
 import static android.content.Intent.CATEGORY_LAUNCHER;
-import static android.view.MenuItem.SHOW_AS_ACTION_ALWAYS;
 
-public class MainActivity extends ActionBarActivity implements ToolbarOwner.View, DrawerPresenter.View, ActivityResultPresenter.View {
+public class MainActivity extends ActionBarActivity implements ToolbarOwner.View, ActivityResultPresenter.View {
 
     private MortarActivityScope activityScope;
     private ToolbarOwner.MenuActions actionBarMenuActions;
     private Toolbar mToolbar;
-    private ActionBarDrawerToggle drawerToggle;
 
     @Inject ToolbarOwner toolbarOwner;
-    @Inject DrawerPresenter drawerPresenter;
     @Inject ActivityResultPresenter activityResultPresenter;
 
     private CoreView coreView;
@@ -74,14 +65,7 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
 
-        drawerToggle = coreView.getDrawerToggle();
-        ActionBarDrawerToggle.Delegate delegate = getV7DrawerToggleDelegate();
-        if (delegate != null) {
-            drawerToggle.setHomeAsUpIndicator(delegate.getThemeUpIndicator());
-        }
-
         toolbarOwner.takeView(this);
-        drawerPresenter.takeView(this);
         activityResultPresenter.takeView(this);
     }
 
@@ -105,10 +89,6 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
 
     /** Inform the view about up events. */
     @Override public boolean onOptionsItemSelected(MenuItem item) {
-        if (drawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-
         if (item.getItemId() == android.R.id.home) {
             return mainFlow.goUp() || mainFlow.goBack();
         }
@@ -145,7 +125,6 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        drawerToggle.onConfigurationChanged(newConfig);
     }
 
     @Override public Context getMortarContext() {
@@ -195,12 +174,6 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
     }
 
     @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        drawerToggle.syncState();
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         activityResultPresenter.onActivityResultReceived(requestCode, resultCode, data);
     }
@@ -208,26 +181,6 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
     @Override
     public MortarScope getMortarScope() {
         return activityScope;
-    }
-
-    @Override
-    public void setDrawerIndicatorEnabled(boolean enabled) {
-        drawerToggle.setDrawerIndicatorEnabled(enabled);
-    }
-
-    @Override
-    public void setDrawerLockMode(int mode) {
-        coreView.setDrawerLockMode(mode);
-    }
-
-    @Override
-    public void openDrawer() {
-        coreView.openDrawer();
-    }
-
-    @Override
-    public void closeDrawer() {
-        coreView.closeDrawer();
     }
 
     @Override public void startActivity(Intent intent) {

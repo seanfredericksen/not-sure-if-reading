@@ -2,6 +2,8 @@ package com.frederis.notsureifreading.screen;
 
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.frederis.notsureifreading.CoreBlueprint;
 import com.frederis.notsureifreading.R;
@@ -52,17 +54,14 @@ public class StudentsListScreen extends TransitionScreen implements Blueprint {
     @Singleton
     public static class Presenter extends ViewPresenter<StudentListView> {
 
-        private final DrawerPresenter mDrawerPresenter;
         private final ToolbarOwner mToolbar;
         private final Flow mFlow;
         private final Observable<ArrayList<Student>> mStudents;
 
         @Inject
-        Presenter(DrawerPresenter drawerPresenter,
-                  ToolbarOwner toolbar,
+        Presenter(ToolbarOwner toolbar,
                   Flow flow,
                   Observable<ArrayList<Student>> students) {
-            mDrawerPresenter = drawerPresenter;
             mToolbar = toolbar;
             mFlow = flow;
             mStudents = students;
@@ -76,12 +75,24 @@ public class StudentsListScreen extends TransitionScreen implements Blueprint {
 
 
             mToolbar.setConfig(new ToolbarOwner.Config.Builder()
-                    .withShowHomeEnabled(true)
-                    .withUpEnabled(true)
                     .withTitleResId(R.string.students)
                     .withElevationDimensionResId(R.dimen.toolbar_elevation)
+                    .withActions(new ToolbarOwner.MenuActions(R.menu.student_list, new ToolbarOwner.MenuActions.Callback() {
+                        @Override
+                        public void onConfigureOptionsMenu(Menu menu) {
+                        }
+
+                        @Override
+                        public boolean onMenuItemSelected(MenuItem menuItem) {
+                            if (menuItem.getItemId() == R.id.logs) {
+                                mFlow.goTo(new LogScreen());
+                                return true;
+                            }
+
+                            return false;
+                        }
+                    }))
                     .build());
-            mDrawerPresenter.setConfig(new DrawerPresenter.Config(true, DrawerLayout.LOCK_MODE_UNLOCKED));
 
             view.showStudents(mStudents);
         }

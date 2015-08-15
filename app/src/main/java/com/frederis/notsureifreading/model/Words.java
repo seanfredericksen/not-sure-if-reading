@@ -41,7 +41,13 @@ public class Words {
     }
 
     public void writeDefaultWords() {
-        InputStream inputStream = mContext.getResources().openRawResource(R.raw.sight_words);
+        writeDefaultWordSet(R.raw.first_hundred_words);
+        writeDefaultWordSet(R.raw.second_hundred_words);
+        writeDefaultWordSet(R.raw.third_hundred_words);
+    }
+
+    private void writeDefaultWordSet(int rawResourceId) {
+        InputStream inputStream = mContext.getResources().openRawResource(rawResourceId);
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 
         try {
@@ -52,7 +58,7 @@ public class Words {
             reader.close();
         } catch (IOException e) {
             e.printStackTrace();
-            throw new IllegalStateException("Failed to write default words");
+            throw new IllegalStateException("Failed to write words: " + rawResourceId);
         }
     }
 

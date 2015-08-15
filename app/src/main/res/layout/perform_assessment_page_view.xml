@@ -5,13 +5,16 @@
              android:layout_height="match_parent"
              android:background="@color/body_text_1">
 
-    <TextView
+    <me.grantland.widget.AutofitTextView
         android:id="@+id/word_name"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="100sp"
+        android:singleLine="true"
+        android:padding="10dip"
         android:textColor="@color/body_text_1_inverse"
-        android:layout_gravity="center"
+        android:layout_gravity="center_vertical"
+        android:gravity="center"
         tools:text="if"/>
 
     <include layout="@layout/include_assessment_answer_fab"/>
