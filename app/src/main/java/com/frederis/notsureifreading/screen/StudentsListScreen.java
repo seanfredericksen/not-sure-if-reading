@@ -87,7 +87,11 @@ public class StudentsListScreen extends TransitionScreen implements Blueprint {
         }
 
         public void onStudentSelected(long id) {
-            mFlow.goTo(new EditStudentScreen(id));
+            if (id == Student.NO_ID) {
+                mFlow.goTo(new EditStudentScreen(id));
+            } else {
+                mFlow.goTo(new StudentDetailScreen(id));
+            }
         }
 
     }

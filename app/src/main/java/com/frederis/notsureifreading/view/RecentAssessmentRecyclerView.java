@@ -42,7 +42,7 @@ public class RecentAssessmentRecyclerView extends RecyclerView
     }
 
     @Override
-    public void setData(ArrayList<RecentAssessment> data) {
+    public void setListData(ArrayList<RecentAssessment> data) {
         setAdapter(new Adapter(getContext(), data, new OnAssessmentSelectedListener() {
             @Override
             public void onAssessmentSelected(long id) {
@@ -123,7 +123,7 @@ public class RecentAssessmentRecyclerView extends RecyclerView
 
     }
 
-    public static interface OnAssessmentSelectedListener {
+    public interface OnAssessmentSelectedListener {
         void onAssessmentSelected(long id);
     }
 

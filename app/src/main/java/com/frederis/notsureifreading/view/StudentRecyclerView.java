@@ -115,7 +115,7 @@ public class StudentRecyclerView extends RecyclerView
     }
 
     @Override
-    public void setData(ArrayList<Student> data) {
+    public void setListData(ArrayList<Student> data) {
         setAdapter(new Adapter(getContext(), data, new OnStudentSelectedListener() {
             @Override
             public void onStudentSelected(long id) {

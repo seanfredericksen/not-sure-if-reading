@@ -5,7 +5,18 @@
     <com.frederis.notsureifreading.view.RecentAssessmentRecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/recent_assessment_recycler_view"/>
+        android:id="@+id/recent_assessment_recycler_view"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/recent_assessment_empty_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No assessments"
+        android:layout_gravity="center"
+        android:paddingBottom="20dip"
+        android:textColor="@color/primary_dark"
+        android:textSize="18sp"/>
 
     <include layout="@layout/include_add_student_fab" />
 

@@ -36,7 +36,7 @@ public class AssessmentWordsRecyclerView extends RecyclerView
     }
 
     @Override
-    public void setData(ArrayList<AssessmentAnswer> data) {
+    public void setListData(ArrayList<AssessmentAnswer> data) {
         setAdapter(new Adapter(getContext(), data));
     }
 

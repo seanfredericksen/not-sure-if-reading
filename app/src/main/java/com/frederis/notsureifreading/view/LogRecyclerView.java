@@ -47,7 +47,7 @@ public class LogRecyclerView extends RecyclerView
     }
 
     @Override
-    public void setData(ArrayList<Log> data) {
+    public void setListData(ArrayList<Log> data) {
         setAdapter(new Adapter(data));
     }
 

@@ -2,9 +2,7 @@ package com.frederis.notsureifreading.util;
 
 import android.content.Context;
 import android.net.Uri;
-import android.util.Log;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.frederis.notsureifreading.R;
@@ -53,7 +51,7 @@ public class SubscriptionUtil {
                 .subscribe(new Action1<T>() {
                     @Override
                     public void call(T data) {
-                        dataHandler.setData(data);
+                        dataHandler.setListData(data);
                     }
                 });
     }
@@ -70,15 +68,15 @@ public class SubscriptionUtil {
                 });
     }
 
-    public static interface ImageDataHandler<T> {
+    public interface ImageDataHandler<T> {
         void setData(T data);
     }
 
-    public static interface ListDataHandler<T> {
-        void setData(T data);
+    public interface ListDataHandler<T> {
+        void setListData(T data);
     }
 
-    public static interface PagerDataHandler<T> {
+    public interface PagerDataHandler<T> {
         void setData(T data);
     }
 

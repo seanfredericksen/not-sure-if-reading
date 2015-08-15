@@ -5,6 +5,7 @@ import android.net.Uri;
 public class Student {
 
     public static final Uri IMAGE_UNCHANGED = Uri.parse("UNCHANGED");
+    public static final long NO_ID = 0L;
 
     private long mId;
     private String mName;

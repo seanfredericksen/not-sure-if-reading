@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:app="http://schemas.android.com/apk/res-auto"
+       xmlns:tools="http://schemas.android.com/tools">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/primary"
+        android:elevation="@dimen/toolbar_elevation"
+        android:orientation="horizontal"
+        android:paddingBottom="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="16dp">
+
+        <com.frederis.notsureifreading.widget.BezelImageView
+            android:id="@+id/student_image"
+            android:layout_width="90dip"
+            android:layout_height="90dip"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dip"
+            android:clickable="true"
+            android:focusable="true"
+            android:scaleType="centerCrop"
+            app:borderDrawable="@drawable/circle_border"
+            app:desaturateOnPress="true"
+            app:maskDrawable="@drawable/circle_mask"/>
+
+        <TextView
+            android:id="@+id/student_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nextFocusDown="@+id/starting_word"
+            android:layout_toRightOf="@id/student_image"
+            android:singleLine="true"
+            android:textColor="@android:color/white"
+            android:textSize="24sp"
+            tools:text="Sean Fredericksen"/>
+
+        <TextView
+            android:id="@+id/current_words"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/starting_word_hint"
+            android:layout_toRightOf="@id/student_image"
+            android:layout_below="@id/student_name"
+            android:singleLine="true"
+            android:textColor="@android:color/white"
+            tools:text="Words: 1 - 20"/>
+
+        <TextView
+            android:id="@+id/current_average"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:layout_toRightOf="@id/student_image"
+            android:textSize="16sp"
+            android:layout_alignBottom="@id/student_image"
+            android:paddingBottom="5dip"
+            android:layout_marginTop="10dip"
+            android:textColor="@android:color/white"
+            tools:text="Current average: 56%"/>
+    </RelativeLayout>
+
+    <com.frederis.notsureifreading.view.RecentAssessmentsView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/student_assessment_recycler"/>
+
+</merge>

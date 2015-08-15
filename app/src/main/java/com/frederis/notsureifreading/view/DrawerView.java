@@ -114,7 +114,7 @@ public class DrawerView extends RecyclerView implements SubscriptionUtil.ListDat
     }
 
     @Override
-    public void setData(ArrayList<NavigationDrawerItem> data) {
+    public void setListData(ArrayList<NavigationDrawerItem> data) {
         setAdapter(new Adapter(getContext(), data, new OnNavigationDrawerItemSelectedListener() {
             @Override
             public void onNavigationDrawerItemSelected(NavigationDrawerItem item) {
