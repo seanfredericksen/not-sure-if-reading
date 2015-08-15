@@ -40,6 +40,11 @@ public class Words {
         mDatabase = database;
     }
 
+    //TODO - Change this to actually look at how many words exist
+    public long getMaxWords() {
+        return 300L;
+    }
+
     public void writeDefaultWords() {
         writeDefaultWordSet(R.raw.first_hundred_words);
         writeDefaultWordSet(R.raw.second_hundred_words);

@@ -19,14 +19,19 @@ import com.frederis.notsureifreading.animation.Transition;
 import com.frederis.notsureifreading.model.Log;
 import com.frederis.notsureifreading.model.Logs;
 import com.frederis.notsureifreading.model.Student;
+import com.frederis.notsureifreading.model.StudentPopupInfo;
 import com.frederis.notsureifreading.model.Students;
+import com.frederis.notsureifreading.model.Words;
+import com.frederis.notsureifreading.model.WordsPopupInfo;
 import com.frederis.notsureifreading.presenter.ActivityResultPresenter;
 import com.frederis.notsureifreading.presenter.ActivityResultRegistrar;
 import com.frederis.notsureifreading.view.EditStudentView;
+import com.frederis.notsureifreading.view.RecentAssessmentListView;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import javax.inject.Singleton;
@@ -37,6 +42,7 @@ import flow.HasParent;
 import flow.Layout;
 import mortar.Blueprint;
 import mortar.MortarScope;
+import mortar.PopupPresenter;
 import mortar.ViewPresenter;
 import rx.Observable;
 import rx.functions.Func1;
@@ -81,10 +87,11 @@ public class EditStudentScreen extends TransitionScreen implements HasParent<Stu
                                    Observable<Student> student,
                                    @MainScope Flow flow,
                                    Logs logs,
+                                   Words words,
                                    DrawerPresenter drawerPresenter,
                                    ToolbarOwner actionBar,
                                    ActivityResultRegistrar activityResultRegistrar) {
-            return new Presenter(mStudentId, students, student, flow, logs, drawerPresenter, actionBar, activityResultRegistrar);
+            return new Presenter(mStudentId, students, student, flow, logs, drawerPresenter, actionBar, words, activityResultRegistrar);
         }
 
     }
@@ -103,6 +110,8 @@ public class EditStudentScreen extends TransitionScreen implements HasParent<Stu
         private final DrawerPresenter drawerPresenter;
         private final ToolbarOwner actionBar;
         private final ActivityResultRegistrar activityResultRegistrar;
+        private final Words words;
+        private final PopupPresenter<WordsPopupInfo, Void> mInvalidWordsPresenter;
 
         private Uri mImageCaptureUri;
 
@@ -118,6 +127,7 @@ public class EditStudentScreen extends TransitionScreen implements HasParent<Stu
                          Logs logs,
                          DrawerPresenter drawerPresenter,
                          ToolbarOwner actionBar,
+                         Words words,
                          ActivityResultRegistrar activityResultRegistrar) {
             this.studentId = studentId;
             this.students = students;
@@ -127,15 +137,13 @@ public class EditStudentScreen extends TransitionScreen implements HasParent<Stu
             this.drawerPresenter = drawerPresenter;
             this.actionBar = actionBar;
             this.activityResultRegistrar = activityResultRegistrar;
-        }
-
-        private Observable<Long> createStudentIdObservable() {
-            return student.map(new Func1<Student, Long>() {
+            this.words = words;
+            mInvalidWordsPresenter = new PopupPresenter<WordsPopupInfo, Void>() {
                 @Override
-                public Long call(Student student) {
-                    return student.getId();
+                protected void onPopupResult(Void result) {
+                    //noop
                 }
-            });
+            };
         }
 
         private Observable<String> createNameObservable() {
@@ -153,7 +161,8 @@ public class EditStudentScreen extends TransitionScreen implements HasParent<Stu
                     .map(new Func1<Student, String>() {
                         @Override
                         public String call(Student student) {
-                            return String.valueOf(student.getStartingWord());
+                            return student.getStartingWord() > 0L
+                                    ? String.valueOf(student.getStartingWord()) : "";
                         }
                     });
         }
@@ -163,7 +172,8 @@ public class EditStudentScreen extends TransitionScreen implements HasParent<Stu
                     .map(new Func1<Student, String>() {
                         @Override
                         public String call(Student student) {
-                            return String.valueOf(student.getEndingWord());
+                            return student.getEndingWord() > 0L
+                                    ? String.valueOf(student.getEndingWord()) : "";
                         }
                     });
         }
@@ -249,6 +259,7 @@ public class EditStudentScreen extends TransitionScreen implements HasParent<Stu
         }
 
         @Override public void dropView(EditStudentView view) {
+            mInvalidWordsPresenter.dropView(view.getInvalidWordsPopup());
             super.dropView(view);
         }
 
@@ -294,6 +305,7 @@ public class EditStudentScreen extends TransitionScreen implements HasParent<Stu
 
             actionBar.setConfig(builder.build());
             drawerPresenter.setConfig(new DrawerPresenter.Config(false, DrawerLayout.LOCK_MODE_UNLOCKED));
+            mInvalidWordsPresenter.takeView(v.getInvalidWordsPopup());
 
             createNameObservable().subscribe(name);
             createStartingWordObservable().subscribe(startingWord);
@@ -305,6 +317,7 @@ public class EditStudentScreen extends TransitionScreen implements HasParent<Stu
                 createStudentImageObservable().subscribe(image);
             }
 
+            v.populateWordInfo(words.getMaxWords());
             v.populateImage(image);
             v.populateName(name);
             v.populateStartingWord(startingWord);
@@ -328,6 +341,10 @@ public class EditStudentScreen extends TransitionScreen implements HasParent<Stu
             }
 
             return false;
+        }
+
+        public void onInvalidWordsEntered(WordsPopupInfo info) {
+            mInvalidWordsPresenter.show(info);
         }
 
 

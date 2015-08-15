@@ -7,6 +7,7 @@ import com.frederis.notsureifreading.CoreBlueprint;
 import com.frederis.notsureifreading.ForApplication;
 import com.frederis.notsureifreading.MainScope;
 import com.frederis.notsureifreading.R;
+import com.frederis.notsureifreading.TransitionScreen;
 import com.frederis.notsureifreading.actionbar.ToolbarOwner;
 import com.frederis.notsureifreading.animation.Transition;
 import com.frederis.notsureifreading.model.Assessment;
@@ -17,7 +18,6 @@ import com.frederis.notsureifreading.model.Word;
 import com.frederis.notsureifreading.model.Words;
 import com.frederis.notsureifreading.util.RecentAssessmentCreator;
 import com.frederis.notsureifreading.view.AssessmentView;
-import com.frederis.notsureifreading.view.RecentAssessmentListView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -27,7 +27,6 @@ import javax.inject.Singleton;
 
 import dagger.Provides;
 import flow.Flow;
-import flow.HasParent;
 import flow.Layout;
 import mortar.Blueprint;
 import mortar.ViewPresenter;
@@ -40,7 +39,7 @@ import rx.subscriptions.Subscriptions;
 
 @Layout(R.layout.assessment_view)
 @Transition({R.animator.slide_in_right, R.animator.slide_out_left, R.animator.slide_in_left, R.animator.slide_out_right})
-public class AssessmentScreen implements HasParent<RecentAssessmentListScreen>, Blueprint {
+public class AssessmentScreen extends TransitionScreen implements Blueprint {
 
     private final long mAssessmentId;
 
@@ -54,10 +53,6 @@ public class AssessmentScreen implements HasParent<RecentAssessmentListScreen>, 
 
     @Override public Object getDaggerModule() {
         return new Module();
-    }
-
-    @Override public RecentAssessmentListScreen getParent() {
-        return new RecentAssessmentListScreen();
     }
 
     @dagger.Module(injects = AssessmentView.class, addsTo = CoreBlueprint.Module.class)
