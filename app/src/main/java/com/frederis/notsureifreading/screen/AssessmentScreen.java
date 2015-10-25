@@ -118,12 +118,12 @@ public class AssessmentScreen extends TransitionScreen implements Blueprint {
             super.dropView(view);
         }
 
-        private Observable<String> createAssessmentWordsObservable() {
-            return mAssessment
-                    .map(new Func1<Assessment, String>() {
+        private Observable<String> createAssessmentWordsObservable(Observable<RecentAssessment> recentAssessmentObservable) {
+            return recentAssessmentObservable
+                    .map(new Func1<RecentAssessment, String>() {
                         @Override
-                        public String call(Assessment assessment) {
-                            return mContext.getString(R.string.words_description, assessment.getStartingWord(), assessment.getEndingWord());
+                        public String call(RecentAssessment assessment) {
+                            return mContext.getString(R.string.total_correct, assessment.totalCorrect, assessment.totalPossible);
                         }
                     });
         }
@@ -138,11 +138,12 @@ public class AssessmentScreen extends TransitionScreen implements Blueprint {
                     });
         }
 
-        private Observable<String> createAssessmentAccuracyObservable() {
-            return mAssessment.map(mRecentAssessmentCreator).map(new Func1<RecentAssessment, String>() {
+        private Observable<String> createAssessmentAccuracyObservable(Observable<RecentAssessment> recentAssessmentObservable) {
+            return recentAssessmentObservable.map(new Func1<RecentAssessment, String>() {
                 @Override
                 public String call(RecentAssessment recentAssessment) {
-                    return mContext.getString(R.string.assessment_accuracy, recentAssessment.percentAccuracy + "%");
+                    return mContext.getString(R.string.assessment_accuracy,
+                            recentAssessment.percentAccuracy + "%");
                 }
             });
         }
@@ -189,9 +190,10 @@ public class AssessmentScreen extends TransitionScreen implements Blueprint {
                     .withElevationDimensionResId(R.dimen.toolbar_elevation)
                     .build());
 
-            createAssessmentWordsObservable().subscribe(mAssessmentWords);
+            Observable<RecentAssessment> recentAssessmentObservable = mAssessment.map(mRecentAssessmentCreator);
+            createAssessmentWordsObservable(recentAssessmentObservable).subscribe(mAssessmentWords);
             createAssessmentDateObservable().subscribe(mAssessmentDate);
-            createAssessmentAccuracyObservable().subscribe(mAssessmentAccuracy);
+            createAssessmentAccuracyObservable(recentAssessmentObservable).subscribe(mAssessmentAccuracy);
             createAssessmentAnswersObservable().subscribe(mAssessmentAnswers);
             createStudentNameObservable().subscribe(mStudentName);
 

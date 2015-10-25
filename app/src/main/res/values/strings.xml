@@ -18,6 +18,7 @@
     <string name="words_must_be_message">Starting and ending word must both be between 1 and %1$d</string>
 
     <string name="words_description">Words: %1$d - %2$d</string>
+    <string name="total_correct">%1$d/%2$d correct</string>
     <string name="current_words">Word set: %1$s</string>
     <string name="current_average">Current average: %1$d%2$s</string>
     <string name="assessment_description">%1$s accuracy on words %2$d to %3$d</string>

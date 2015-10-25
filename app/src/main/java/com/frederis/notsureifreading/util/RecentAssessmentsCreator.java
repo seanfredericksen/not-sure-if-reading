@@ -24,19 +24,23 @@ public class RecentAssessmentsCreator implements Func1<ArrayList<Assessment>, Ar
         ArrayList<RecentAssessment> recentAssessments = new ArrayList<>();
 
         for (Assessment assessment : assessments) {
+            int totalWords = (int) (assessment.getEndingWord() - assessment.getStartingWord() + 1);
+            int totalCorrect = getTotalCorrect(assessment, totalWords);
+
             recentAssessments.add(new RecentAssessment(assessment,
                     mStudents.readStudent(assessment.getStudentId()).getName(),
-                    calculateAccuracy(assessment)));
+                    totalCorrect,
+                    totalWords,
+                    Math.round(((float) totalCorrect / (float) totalWords) * 100f)));
         }
 
         return recentAssessments;
     }
 
-    private int calculateAccuracy(Assessment assessment) {
-        float total = (float) (assessment.getEndingWord() - assessment.getStartingWord() + 1);
-        float correct = 0.0f;
+    private int getTotalCorrect(Assessment assessment, int totalWords) {
+        int correct = 0;
 
-        for (int i = 0; i < total; i++) {
+        for (int i = 0; i < totalWords; i++) {
             long result =
                     (i < 50
                             ? assessment.getOneToFiftyResult()
@@ -48,7 +52,7 @@ public class RecentAssessmentsCreator implements Func1<ArrayList<Assessment>, Ar
             }
         }
 
-        return Math.round((correct / total) * 100f);
+        return correct;
     }
 
 }

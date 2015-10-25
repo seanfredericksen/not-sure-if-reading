@@ -105,7 +105,7 @@ public class PerformAssessmentView extends FractionalViewPager
             mLUtils = new LUtils(context);
             mWordAssessments = wordAssessments;
 
-            mTypeFace = Typeface.createFromAsset(context.getAssets(), "fonts/ComingSoon.ttf");
+            mTypeFace = Typeface.createFromAsset(context.getAssets(), "fonts/Schoolbell.ttf");
         }
 
         @Override

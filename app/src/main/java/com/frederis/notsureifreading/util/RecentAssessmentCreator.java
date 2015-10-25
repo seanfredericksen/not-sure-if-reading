@@ -19,16 +19,20 @@ public class RecentAssessmentCreator implements Func1<Assessment, RecentAssessme
 
     @Override
     public RecentAssessment call(Assessment assessment) {
+        int totalWords = (int) (assessment.getEndingWord() - assessment.getStartingWord() + 1);
+        int totalCorrect = getTotalCorrect(assessment, totalWords);
+
         return new RecentAssessment(assessment,
                 mStudents.readStudent(assessment.getStudentId()).getName(),
-                calculateAccuracy(assessment));
+                totalCorrect,
+                totalWords,
+                Math.round(((float) totalCorrect / (float) totalWords) * 100f));
     }
 
-    private int calculateAccuracy(Assessment assessment) {
-        float total = (float) (assessment.getEndingWord() - assessment.getStartingWord() + 1);
-        float correct = 0.0f;
+    private int getTotalCorrect(Assessment assessment, int totalWords) {
+        int correct = 0;
 
-        for (int i = 0; i < total; i++) {
+        for (int i = 0; i < totalWords; i++) {
             long result =
                     (i < 50
                             ? assessment.getOneToFiftyResult()
@@ -40,7 +44,7 @@ public class RecentAssessmentCreator implements Func1<Assessment, RecentAssessme
             }
         }
 
-        return Math.round((correct / total) * 100f);
+        return correct;
     }
 
 }
