@@ -15,6 +15,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.frederis.notsureifreading.actionbar.ToolbarOwner;
+import com.frederis.notsureifreading.activity.BackPresenter;
+import com.frederis.notsureifreading.dialog.ConfirmationDialogFragment;
 import com.frederis.notsureifreading.presenter.ActivityResultPresenter;
 import com.frederis.notsureifreading.view.CoreView;
 
@@ -31,19 +33,28 @@ import timber.log.Timber;
 import static android.content.Intent.ACTION_MAIN;
 import static android.content.Intent.CATEGORY_LAUNCHER;
 
-public class MainActivity extends ActionBarActivity implements ToolbarOwner.View, ActivityResultPresenter.View {
+public class MainActivity extends ActionBarActivity implements ToolbarOwner.View,
+        ActivityResultPresenter.View, ConfirmationDialogFragment.Listener,
+        BackPresenter.View {
 
     private MortarActivityScope activityScope;
     private ToolbarOwner.MenuActions actionBarMenuActions;
     private Toolbar mToolbar;
 
-    @Inject ToolbarOwner toolbarOwner;
-    @Inject ActivityResultPresenter activityResultPresenter;
+    @Inject
+    ToolbarOwner toolbarOwner;
+    @Inject
+    ActivityResultPresenter activityResultPresenter;
+    @Inject
+    BackPresenter backPresenter;
 
     private CoreView coreView;
     private Flow mainFlow;
+    private boolean mShouldConfirmBacks;
+    private boolean mShouldConfirmUps;
 
-    @Override protected void onCreate(Bundle savedInstanceState) {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if (isWrongInstance()) {
@@ -67,37 +78,54 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
 
         toolbarOwner.takeView(this);
         activityResultPresenter.takeView(this);
+        backPresenter.takeView(this);
     }
 
-    @Override public Object getSystemService(String name) {
+    @Override
+    public Object getSystemService(String name) {
         if (Mortar.isScopeSystemService(name)) {
             return activityScope;
         }
         return super.getSystemService(name);
     }
 
-    @Override protected void onSaveInstanceState(Bundle outState) {
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         activityScope.onSaveInstanceState(outState);
     }
 
-    /** Inform the view about back events. */
-    @Override public void onBackPressed() {
+    /**
+     * Inform the view about back events.
+     */
+    @Override
+    public void onBackPressed() {
         // Give the view a chance to handle going back. If it declines the honor, let super do its thing.
-        if (!mainFlow.goBack()) super.onBackPressed();
+        if (mShouldConfirmBacks) {
+            new ConfirmationDialogFragment().show(getSupportFragmentManager(), "backConfirm");
+        } else if (!mainFlow.goBack()) {
+            super.onBackPressed();
+        }
     }
 
-    /** Inform the view about up events. */
-    @Override public boolean onOptionsItemSelected(MenuItem item) {
+    /**
+     * Inform the view about up events.
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            return mainFlow.goUp() || mainFlow.goBack();
+            onBackPressed();
+            return true;
         }
 
         return actionBarMenuActions != null && actionBarMenuActions.callback.onMenuItemSelected(item) || super.onOptionsItemSelected(item);
     }
 
-    /** Configure the action bar menu as required by {@link com.frederis.notsureifreading.actionbar.ToolbarOwner.View}. */
-    @Override public boolean onCreateOptionsMenu(Menu menu) {
+    /**
+     * Configure the action bar menu as required by {@link com.frederis.notsureifreading.actionbar.ToolbarOwner.View}.
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
         if (actionBarMenuActions != null) {
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(actionBarMenuActions.menuResource, menu);
@@ -108,7 +136,8 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
         return true;
     }
 
-    @Override protected void onDestroy() {
+    @Override
+    protected void onDestroy() {
         super.onDestroy();
 
         toolbarOwner.dropView(this);
@@ -127,26 +156,31 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
         super.onConfigurationChanged(newConfig);
     }
 
-    @Override public Context getMortarContext() {
+    @Override
+    public Context getMortarContext() {
         return this;
     }
 
-    @Override public void setShowHomeEnabled(boolean enabled) {
+    @Override
+    public void setShowHomeEnabled(boolean enabled) {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(enabled);
     }
 
-    @Override public void setUpButtonEnabled(boolean enabled) {
+    @Override
+    public void setUpButtonEnabled(boolean enabled) {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(enabled);
         actionBar.setHomeButtonEnabled(enabled);
     }
 
-    @Override public void setTitleResId(int titleResId) {
+    @Override
+    public void setTitleResId(int titleResId) {
         getSupportActionBar().setTitle(titleResId);
     }
 
-    @Override public void setMenu(ToolbarOwner.MenuActions action) {
+    @Override
+    public void setMenu(ToolbarOwner.MenuActions action) {
         if (action != actionBarMenuActions) {
             actionBarMenuActions = action;
             invalidateOptionsMenu();
@@ -183,7 +217,13 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
         return activityScope;
     }
 
-    @Override public void startActivity(Intent intent) {
+    @Override
+    public void setShouldPromptOnBack(boolean prompt) {
+        mShouldConfirmBacks = prompt;
+    }
+
+    @Override
+    public void startActivity(Intent intent) {
         if (canHandleIntent(intent)) {
             startActivity(intent);
         } else {
@@ -191,7 +231,8 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
         }
     }
 
-    @Override public void startActivityForResult(int requestCode, Intent intent) {
+    @Override
+    public void startActivityForResult(int requestCode, Intent intent) {
         if (canHandleIntent(intent)) {
             startActivityForResult(intent, requestCode);
         } else {
@@ -203,6 +244,13 @@ public class MainActivity extends ActionBarActivity implements ToolbarOwner.View
         PackageManager manager = getPackageManager();
         List<ResolveInfo> info = manager.queryIntentActivities(intent, 0);
         return info.size() > 0;
+    }
+
+    @Override
+    public void onConfirmation(boolean allowed) {
+        if (allowed && !mainFlow.goBack()) {
+            super.onBackPressed();
+        }
     }
 
 }

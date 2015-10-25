@@ -3,7 +3,6 @@ package com.frederis.notsureifreading.view;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,8 +24,6 @@ import javax.inject.Inject;
 
 import mortar.Mortar;
 import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
 
 public class PerformAssessmentView extends FractionalViewPager

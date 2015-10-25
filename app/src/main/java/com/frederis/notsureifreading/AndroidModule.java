@@ -2,6 +2,7 @@ package com.frederis.notsureifreading;
 
 import com.frederis.notsureifreading.actionbar.DrawerPresenter;
 import com.frederis.notsureifreading.actionbar.ToolbarOwner;
+import com.frederis.notsureifreading.activity.BackPresenter;
 import com.frederis.notsureifreading.presenter.ActivityResultPresenter;
 import com.frederis.notsureifreading.presenter.ActivityResultRegistrar;
 
@@ -26,6 +27,11 @@ public class AndroidModule {
     @Provides @Singleton
     ActivityResultRegistrar provideIntentLauncher(ActivityResultPresenter presenter) {
         return presenter;
+    }
+
+    @Provides @Singleton
+    BackPresenter provideBackPresenter() {
+        return new BackPresenter();
     }
 
 }

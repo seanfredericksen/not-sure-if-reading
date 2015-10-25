@@ -9,6 +9,7 @@ import com.frederis.notsureifreading.MainScope;
 import com.frederis.notsureifreading.R;
 import com.frederis.notsureifreading.TransitionScreen;
 import com.frederis.notsureifreading.actionbar.ToolbarOwner;
+import com.frederis.notsureifreading.activity.BackPresenter;
 import com.frederis.notsureifreading.animation.Transition;
 import com.frederis.notsureifreading.model.Assessment;
 import com.frederis.notsureifreading.model.Assessments;
@@ -30,6 +31,7 @@ import dagger.Provides;
 import flow.Flow;
 import flow.Layout;
 import mortar.Blueprint;
+import mortar.MortarScope;
 import mortar.ViewPresenter;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -77,8 +79,8 @@ public class PerformAssessmentScreen extends TransitionScreen implements Bluepri
         }
 
         @Provides
-        Presenter providePresenter(Observable<ArrayList<Word>> words, Assessments assessments, Observable<String> studentName, Logs logs, @MainScope Flow flow, ToolbarOwner toolbarOwner) {
-            return new Presenter(mStudentId, words, assessments, studentName, logs, flow, toolbarOwner);
+        Presenter providePresenter(Observable<ArrayList<Word>> words, Assessments assessments, BackPresenter backPresenter, Observable<String> studentName, Logs logs, @MainScope Flow flow, ToolbarOwner toolbarOwner) {
+            return new Presenter(mStudentId, words, assessments, backPresenter, studentName, logs, flow, toolbarOwner);
         }
 
     }
@@ -90,15 +92,17 @@ public class PerformAssessmentScreen extends TransitionScreen implements Bluepri
         private final Observable<ArrayList<Word>> mWords;
         private final Assessments mAssessments;
         private final Observable<String> mStudentName;
+        private final BackPresenter mBackPresenter;
         private final Logs mLogs;
         private final Flow mFlow;
         private final ToolbarOwner mActionBar;
 
         @Inject
-        Presenter(long studentId, Observable<ArrayList<Word>> words, Assessments assessments, Observable<String> studentName, Logs logs, Flow flow, ToolbarOwner actionBar) {
+        Presenter(long studentId, Observable<ArrayList<Word>> words, Assessments assessments, BackPresenter backPresenter, Observable<String> studentName, Logs logs, Flow flow, ToolbarOwner actionBar) {
             mStudentId = studentId;
             mFlow = flow;
             mLogs = logs;
+            mBackPresenter = backPresenter;
             mStudentName = studentName;
             mAssessments = assessments;
             mWords = words;
@@ -135,7 +139,22 @@ public class PerformAssessmentScreen extends TransitionScreen implements Bluepri
                     }))
                     .build());
 
+
             view.showWords(mWords);
+        }
+
+        @Override
+        protected void onEnterScope(MortarScope scope) {
+            super.onEnterScope(scope);
+
+            mBackPresenter.setShouldPromptOnBack(true);
+        }
+
+        @Override
+        protected void onExitScope() {
+            super.onExitScope();
+
+            mBackPresenter.setShouldPromptOnBack(false);
         }
 
         private Assessment getAssessment() {
